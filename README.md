@@ -8,17 +8,20 @@ This repo was developed so I could locally test an app that consists of:
 ## Notable Features
 
 - localAwsApiGw is an integrated Node JS static web, REST and WebSocket server that runs locally.
-- All app specific files are referenced from their local development location so are always in sync with what eventually gets deployed in the AWS cloud.
-- SAM/Cloudformation REST and WebSocket templates are read and parsed to create the routing information used by localAwsApiGw and are therefore also always
-in sync with what eventually gets deployed in the AWS cloud
+- All lambda integration files are referenced from their local development location so are always in sync with what eventually gets deployed in the AWS cloud.
+- SAM/Cloudformation REST and WebSocket templates are read and parsed to create the routing information and the environment variables used by the lambda integrations and are therefore also always in sync with what eventually gets deployed in the AWS cloud.
 
 ## Usage
 
-```node localAwsGw.js --web=dir | --api=dir [apiT=template.yaml] | --ws=dir [wsT=template.yaml]```
+```PORT=xxxx node localAwsGw.js --web=dir | --api=dir [apiT=template.yaml] | --ws=dir [wsT=template.yaml]```
+
+```PORT``` where the server is listening.
 
 ```dir``` is is the absolute or relative path to the respective server files.
 
-```apiT``` and ```apiT``` default to ```template.yaml``` but can be ```anything.[yaml|json|yml]```
+```apiT``` and ```apiT``` default to ```template.yaml``` but can be ```anything.[yaml|json|yml]```.
+
+Example: ```PORT=3000 node localAwsGw.js --web=../brume.occams.solutions --api=../brume-api --ws=../brume-local-aws-server```.
 
 ## Disclaimer
 
