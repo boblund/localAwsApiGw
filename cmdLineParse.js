@@ -10,7 +10,7 @@ var argv = require('minimist')(process.argv.slice(2), {default: defaults});
 
 if(!Object.keys(argv).every(e=>options.includes(e)) // only valid options
 	|| !required.some(e=>Object.keys(argv).indexOf(e) >= 0)) { // at least one required
-	console.log('USAGE: node', process.argv[1].split('/').pop(), usage);
+	console.log('USAGE: PORT= xxxx node', process.argv[1].split('/').pop(), usage);
 } else {
 	for(const option of Object.keys(argv)){
 		switch(option) {
