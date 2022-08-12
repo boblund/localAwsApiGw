@@ -1,17 +1,22 @@
-const WebSocket = require('ws');
+'use strict';
+
+// Based on https://github.com/JamesKyburz/aws-lambda-ws-server
+// but uses https://steveholgado.com/aws-lambda-local-development/#creating-our-lambda-function
+// for lambda execution
+
 const lambdaLocal = require('lambda-local');
 
-function wsApiGw(app, wsApi) {
+function wsApiGw(httpServer, wsApi) {
 	const mappingKey = wsApi.mappingKey || 'action';
 
-	const wss = new WebSocket.Server({
-		port: process.env.PORT,
+	// Create web socket server on top of a regular http server
+	const wsServer = require('ws').Server;
+	const wss = new wsServer({
+		server: httpServer,
 		verifyClient (info, fn) {
 			wss.emit('verifyClient', info, fn)
 		}
 	});
-
-	console.log('localWsServer.js started on port', process.env.PORT);
 
 	const clients = {};
 	const context = () => ({
@@ -33,8 +38,6 @@ function wsApiGw(app, wsApi) {
 
 	wss.removeAllListeners('verifyClient');
 	wss.on('verifyClient', async (info, fn) => {
-		//let result = await routes['$connect'](event('$connect', info.req), context())
-		//let result = await wsApi.routes['$connect'].lambdaPath
 		const result = await lambdaLocal.execute({
 			...wsApi.routes['$connect'],
 			timeoutMs: 1000*60,
@@ -49,15 +52,14 @@ function wsApiGw(app, wsApi) {
 
 		fn(result.statusCode === 200, result.statusCode, result.body);
 	});
+
 	wss.on('connection', (ws, req) => {
 		const connectionId = req.headers['sec-websocket-key'];
 		clients[connectionId] = ws;
-		//routes['$connect'](event('$connect', req), context())
 
 		ws.on('close', async () => {
 			try {
 				delete clients[connectionId]
-				//await routes['$disconnect'](event('$disconnect', req), context())
 				await lambdaLocal.execute({
 					...wsApi.routes['$disconnect'],
 					timeoutMs: 1000*60,
@@ -90,7 +92,6 @@ function wsApiGw(app, wsApi) {
 			message = message.toString();
 			try {
 				if(routeKey != '$default') {
-					//await routes[routeKey](event(routeKey, req, message),context());
 					await lambdaLocal.execute({
 						...wsApi.routes[routeKey],
 						timeoutMs: 1000*60,

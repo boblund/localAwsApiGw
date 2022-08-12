@@ -1,3 +1,7 @@
+'use strict';
+
+// Based on https://steveholgado.com/aws-lambda-local-development/#creating-our-lambda-function
+
 const express = require('express');
 const bodyParser = require('body-parser');
 const lambdaLocal = require('lambda-local');
