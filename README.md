@@ -74,7 +74,11 @@ await postToConnection({
 
 ```apiT``` and ```apiT``` default to ```template.yaml``` but can be ```anything.[yaml|json|yml]```.
 
-Example: ```PORT=3000 node localAwsGw.js --web=../brume.occams.solutions --api=../brume-api --ws=../brume-local-aws-server```.
+Example:
+
+```
+PORT=3000 node localAwsGw.js --web=s3Files --api=restApiFiles --ws=wsApiFiles
+```
 
 ## Disclaimer
 
