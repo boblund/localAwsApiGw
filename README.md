@@ -28,7 +28,7 @@ function _executeSync(opts) {
   ...
   if (opts.clientContext) {
     try {
-    clientContext = JSON.parse(opts.clientContext);
+      clientContext = JSON.parse(opts.clientContext);
 ```
 
 to
