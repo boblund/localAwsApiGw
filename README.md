@@ -24,17 +24,21 @@ The [lambda-local module](https://www.npmjs.com/package/lambda-local) ```clientC
 Open ```node_modules/lambda-local/build/lambdalocal.js``` in your favorite editor. Change:
 
 ```
-if (opts.clientContext) {
-        try {
-            clientContext = JSON.parse(opts.clientContext);
+function _executeSync(opts) {
+	...
+	if (opts.clientContext) {
+		try {
+				clientContext = JSON.parse(opts.clientContext);
 ```
 
 to
 
 ```
-if (opts.clientContext) {
-        try {
-            clientContext = opts.clientContext;
+function _executeSync(opts) {
+	...
+	if (opts.clientContext) {
+		try {
+				clientContext = opts.clientContext;
 ```
 
 ## Usage
