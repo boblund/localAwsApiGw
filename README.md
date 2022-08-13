@@ -82,7 +82,7 @@ PORT=3000 node localAwsGw.js --web=s3Files --api=restApiFiles --ws=wsApiFiles
 
 ## Disclaimer
 
-I use this for testing my project with two SAM templates for the REST API and Websocket API. I have no idea how well ```apiGwLambdas.js``` will parse other templates to create the routes and environment so check the returned objects if things don't work.
+I use this for testing my project with two SAM templates for the REST API and Websocket API. I have no experience how well ```apiGwLambdas.js``` will parse other templates to create the routes and environment so check the returned objects if things don't work.
 
 ## Feedback welcome
 
