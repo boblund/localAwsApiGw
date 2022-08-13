@@ -13,8 +13,6 @@ const apiGwLambdas = require('./apiGwLambdas.js');
 const servers = require('./cmdLineParse.js'); //process command line
 if(Object.keys(servers).length == 0) {
 	process.exit(1);
-} else {
-	//console.log('servers:', JSON.stringify(servers, null, 2));
 }
 
 const httpServer = require('http').createServer();
@@ -36,12 +34,10 @@ let app = null;
 
 			case 'ws':
 				const {wsApi} = await apiGwLambdas(servers.ws);
-				wsApiGw(httpServer/*app*/, wsApi);
-				//app.listen(3001, () => console.log('listening on port: 3001'));
+				wsApiGw(httpServer, wsApi);
 				break;
 		}
 	}
-	//app.listen(3000, () => console.log('listening on port: 3000'));
 
 	if(app) httpServer.on('request', app); // Mount the app if it exists
 	httpServer.listen(process.env.PORT, function() {

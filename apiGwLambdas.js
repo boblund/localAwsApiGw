@@ -6,12 +6,10 @@ const jsYaml = require('js-yaml');
 const { schema } = require('yaml-cfn');
 const {readFileSync} = require('fs');
 const {join} = require('path');
-//const AWS = require('aws-sdk');
 const ssm = new (require('aws-sdk')).SSM({region: 'us-east-1'});
 
 let restApi = {};
 let wsApi = {};
-
 
 async function apiGwLambdas({filesPath, templateName}) {
 	const templatePath = join(filesPath, templateName);
@@ -90,13 +88,10 @@ async function apiGwLambdas({filesPath, templateName}) {
 			continue;
 		}
 
-
 		const [app, lambdaHandler] = Handler.split('.');
 		const environment = Environment.Variables;
 	
 		for(let envVar in environment) {
-			//environment[envVar] = environment[envVar].Ref == undefined
-			//	? environment[envVar] : template.Parameters[environment[envVar].Ref].Default;
 			environment[envVar] = environment[envVar].Ref
 				? template.Parameters[environment[envVar].Ref].Default
 				: environment[envVar]['Fn::Sub']
@@ -119,8 +114,3 @@ async function apiGwLambdas({filesPath, templateName}) {
 }
 
 module.exports = apiGwLambdas;
-/*
-(async ()=> {
-	let result = await apiGwLambdas({filesPath: process.argv[2], templateName: process.argv[3]});
-})();
-*/

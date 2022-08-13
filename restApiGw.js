@@ -7,26 +7,24 @@
 const express = require('express');
 const bodyParser = require('body-parser');
 const lambdaLocal = require('lambda-local');
-process.env.IS_LAMBDA_LOCAL = true;
+process.env.IS_LAMBDA_LOCAL = true; // Guarenteed way for lambda to detect running locally
 
 function restApiGw(app, restApi) {
 	app.use(bodyParser.json())
 	app.use(bodyParser.urlencoded({ extended: true }))
 	app.use(express.text());
-	//const cors = require('cors');
 	app.use(require('cors')());
 
 	app.use('*', async (req, res) => {
 		let options = restApi[req.baseUrl];
 		if(!options) {
-			//console.log(`no options`);
 			res
 			.status(200)
 			.end()
 		} else {
 			//console.log(`${req.baseUrl}`);
 			const result = await lambdaLocal.execute({
-				...options, //appOptns[req.baseUrl],
+				...options,
 				timeoutMs: 1000*60,
 				verboseLevel: 0,
 				event: {
@@ -36,7 +34,6 @@ function restApiGw(app, restApi) {
 			});
 
 			// Respond to HTTP request
-			//console.log(`res: ${result.body}`);
 			res
 				.status(result?.statusCode)
 				.set(result?.headers)

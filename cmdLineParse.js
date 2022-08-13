@@ -32,11 +32,3 @@ if(!Object.keys(argv).every(e=>options.includes(e)) // only valid options
 }
 
 module.exports = servers;
-
-/*
-if(Object.keys(servers).length == 0) {
-	process.exit(1);
-} else {
-	console.log('servers:', JSON.stringify(servers, null, 2));
-}
-*/
