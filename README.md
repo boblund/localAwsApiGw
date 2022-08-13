@@ -8,8 +8,8 @@ This repo was developed so I could locally test an app that consists of:
 ## Notable Features
 
 - localAwsApiGw is an integrated Node JS static web, REST and WebSocket server that runs locally.
-- All lambda integration files are referenced from their local development location so are always in sync with what eventually gets deployed in the AWS cloud.
-- SAM/Cloudformation REST and WebSocket templates are read and parsed to create the routing information and the environment variables used by the lambda integrations and are therefore also always in sync with what eventually gets deployed in the AWS cloud.
+- All lambda integration files are referenced from their local development location so are the same as what eventually gets deployed in the AWS cloud.
+- SAM/Cloudformation REST and WebSocket templates are read and parsed to create the routing information, event, context and the environment variables used by the lambda integrations and are therefore also the same as what eventually gets deployed in the AWS cloud.
 
 ## Installation
 
@@ -41,7 +41,30 @@ function _executeSync(opts) {
       clientContext = opts.clientContext;
 ```
 
-## Usage
+## Use
+
+### Modify Websocket lambda functions
+
+REST lambda integrations can be used as is with localAwsApiGw. Websocket lambda integrations need to be modified to detect when running locally to use a local version of
+```AWS.ApiGatewayManagementApi.postToConnection().promise()```.
+
+```
+let postToConnection = process.env.IS_LAMBDA_LOCAL
+  ? (o) => { return context.clientContext.postToConnection(o)} //localApiGw
+  : (o) => { return apigwApi.postToConnection(o).promise() } //AWS
+```
+
+then
+
+```
+// send message on a websocket
+await postToConnection({
+  ConnectionId: your.connectionId,
+  Data: yourStringData
+})
+```
+
+### Running the server
 
 ```PORT=xxxx node localAwsGw.js --web=dir | --api=dir [apiT=template.yaml] | --ws=dir [wsT=template.yaml]```
 
