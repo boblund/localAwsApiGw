@@ -1,3 +1,5 @@
+// License: Creative Commons Attribution-NonCommercial 4.0 International
+
 'use strict';
 
 // Based on https://steveholgado.com/aws-lambda-local-development/#creating-our-lambda-function

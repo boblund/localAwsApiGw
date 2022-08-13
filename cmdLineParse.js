@@ -1,3 +1,5 @@
+// License: Creative Commons Attribution-NonCommercial 4.0 International
+
 'use strict';
 
 const defaults = {apiT:'template.yaml', wsT:'template.yaml'};

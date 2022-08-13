@@ -1,3 +1,5 @@
+// License: Creative Commons Attribution-NonCommercial 4.0 International
+
 'use strict';
 
 // Integrated local AWS s3 static web and rest/ws api server.
