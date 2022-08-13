@@ -25,20 +25,20 @@ Open ```node_modules/lambda-local/build/lambdalocal.js``` in your favorite edito
 
 ```
 function _executeSync(opts) {
-	...
-	if (opts.clientContext) {
-		try {
-				clientContext = JSON.parse(opts.clientContext);
+  ...
+  if (opts.clientContext) {
+    try {
+    clientContext = JSON.parse(opts.clientContext);
 ```
 
 to
 
 ```
 function _executeSync(opts) {
-	...
-	if (opts.clientContext) {
-		try {
-				clientContext = opts.clientContext;
+  ...
+  if (opts.clientContext) {
+    try {
+      clientContext = opts.clientContext;
 ```
 
 ## Usage
