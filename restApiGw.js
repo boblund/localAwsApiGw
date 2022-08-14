@@ -19,7 +19,7 @@ function restApiGw(app, restApi) {
 		let options = restApi[req.baseUrl];
 		if(!options) {
 			res
-			.status(200)
+			.status(404)
 			.end()
 		} else {
 			//console.log(`${req.baseUrl}`);

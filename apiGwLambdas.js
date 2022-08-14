@@ -8,10 +8,8 @@ const {readFileSync} = require('fs');
 const {join} = require('path');
 const ssm = new (require('aws-sdk')).SSM({region: 'us-east-1'});
 
-let restApi = {};
-let wsApi = {};
-
 async function apiGwLambdas({filesPath, templateName}) {
+	let apis = {};
 	const templatePath = join(filesPath, templateName);
 	let template = '';
 
@@ -36,12 +34,12 @@ async function apiGwLambdas({filesPath, templateName}) {
 
 			} catch(e) {
 				console.error(`apiGwLambdas: error parsing ${templatePath}`);
-				return undefined;
+				return apis;
 			}
 		
 		default:
 			console.error(`apiGwLambdas: error parsing ${templatePath}`);
-			return undefined;
+			return apis;
 	}
 
 	for(let param in template.Parameters) {
@@ -63,17 +61,23 @@ async function apiGwLambdas({filesPath, templateName}) {
 	for(let resourceName in template.Resources) {
 		let resource = template.Resources[resourceName];
 
-		if(resource.Type == "AWS::Serverless::Function" && resource.Properties.Events) {
+		if(resource.Type == 'AWS::Serverless::Api'){
+
+			apis.restApi = {};
+			continue;
+
+		} else if(resource.Type == "AWS::Serverless::Function" && resource.Properties.Events) {
 
 			let Events;
 			({CodeUri, Handler, Environment, Events} = resource.Properties);
 			ApiKey = Events[Object.keys(Events)[0]].Properties.Path;
-			Routes = restApi;
+			Routes = apis.restApi; //restApi;
 
 		} else if(resource.Type == 'AWS::ApiGatewayV2::Api' && resource.Properties.ProtocolType == 'WEBSOCKET') {
 
-			wsApi.mappingKey = resource.Properties.RouteSelectionExpression.split('.')[2];
-			wsApi.routes = {};
+			apis.wsApi={};
+			apis.wsApi.mappingKey = resource.Properties.RouteSelectionExpression.split('.')[2];
+			apis.wsApi.routes = {};
 			continue;
 
 		} else if(resource.Type == "AWS::ApiGatewayV2::Route") {
@@ -83,7 +87,7 @@ async function apiGwLambdas({filesPath, templateName}) {
 				.IntegrationUri['Fn::Sub'].match(/^.*functions\/\$\{(.*)\.Arn.*/)[1];
 			({CodeUri, Handler, Environment} = template.Resources[integFunction].Properties);
 			ApiKey = resource.Properties.RouteKey;
-			Routes = wsApi.routes;
+			Routes = apis.wsApi.routes;
 
 		} else {
 
@@ -109,10 +113,10 @@ async function apiGwLambdas({filesPath, templateName}) {
 
 	}
 
-	return {
+	return apis; /*{
 		restApi: (Object.keys(restApi).length == 0) ? null : restApi,
 		wsApi: (Object.keys(wsApi).length == 0) ? null : wsApi
-	};
+	};*/
 }
 
 module.exports = apiGwLambdas;
