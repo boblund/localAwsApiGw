@@ -35,10 +35,12 @@ async function apiGwLambdas({filesPath, templateName}) {
 				break;
 
 			} catch(e) {
+				console.error(`apiGwLambdas: error parsing ${templatePath}`);
 				return undefined;
 			}
 		
 		default:
+			console.error(`apiGwLambdas: error parsing ${templatePath}`);
 			return undefined;
 	}
 

@@ -9,6 +9,7 @@ const express = require('express');
 const restApiGw = require('./restApiGw.js');
 const wsApiGw = require('./wsApiGw.js');
 const apiGwLambdas = require('./apiGwLambdas.js');
+const {existsSync} = require('fs');
 
 const servers = require('./cmdLineParse.js'); //process command line
 if(Object.keys(servers).length == 0) {
@@ -22,19 +23,35 @@ let app = null;
 	for(let server in servers) {
 		switch(server) {
 			case 'web':
-				app = app ? app : express(); //app if necessary
-				app.use(express.static(servers.web.filesPath));
+				if(existsSync(servers.web.filesPath)) {
+					app = app ? app : express(); //app if necessary
+					app.use(express.static(servers.web.filesPath));
+				} else {
+					console.error(`${process.argv[1].split('/').pop()}: ${servers.web.filesPath} does not exist`);
+					process.exit(1);
+				}
 				break;
 
 			case 'api':
 				app = app ? app : express(); //app if necessary
-				const {restApi} = await apiGwLambdas(servers.api);
-				restApiGw(app, restApi);
+				const restApi = await apiGwLambdas(servers.api);
+				if(restApi) {
+					restApiGw(app, restApi.restApi);
+				} else {
+					console.error(`${process.argv[1].split('/').pop()}: no restApi`);
+					process.exit(1);
+				}
 				break;
 
 			case 'ws':
-				const {wsApi} = await apiGwLambdas(servers.ws);
-				wsApiGw(httpServer, wsApi);
+				if(!servers?.ws) break;
+				const wsApi = await apiGwLambdas(servers.ws);
+				if(wsApi) {
+					wsApiGw(httpServer, wsApi.wsApi);
+				} else {
+					console.error(`${process.argv[1].split('/').pop()}: no wsApi`);
+					process.exit(1);
+				}
 				break;
 		}
 	}
