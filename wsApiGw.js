@@ -48,8 +48,7 @@ function wsApiGw(httpServer, wsApi) {
 				requestContext: {routeKey: '$connect', connectionId: info.req.headers['sec-websocket-key']},
 				headers: info.req.headers, // Pass on request headers
 				body: info.req.body // Pass on request body
-			},
-			clientContext: context()
+			}
 		});
 
 		fn(result.statusCode === 200, result.statusCode, result.body);
@@ -70,8 +69,7 @@ function wsApiGw(httpServer, wsApi) {
 						requestContext: {routeKey: '$disconnect', connectionId: req.headers['sec-websocket-key']},
 						headers: req.headers, // Pass on request headers
 						body: req.body // Pass on request body
-					},
-					clientContext: context()
+					}
 				});
 			} catch (e) {
 				console.error(e);
