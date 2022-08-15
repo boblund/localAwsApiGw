@@ -32,9 +32,9 @@ let app = null;
 				}
 				break;
 
-			case 'api':
+			case 'rest':
 				app = app ? app : express(); //app if necessary
-				const {restApi} = await apiGwLambdas(servers.api);
+				const {restApi} = await apiGwLambdas(servers.rest);
 				if(restApi && Object.keys(restApi).length > 0) {
 					restApiGw(app, restApi);
 				} else {

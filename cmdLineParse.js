@@ -2,10 +2,10 @@
 
 'use strict';
 
-const defaults = {apiT:'template.yaml', wsT:'template.yaml'};
-const options = ['_', 'web', 'api', 'apiT', 'ws', 'wsT'];
-const required = ['web', 'api', 'ws'];
-const usage = `--web=dir | --api=dir [apiT=template.yaml] | --ws=dir [wsT=template.yaml]`
+const defaults = {restT:'template.yaml', wsT:'template.yaml'};
+const options = ['_', 'web', 'rest', 'restT', 'ws', 'wsT'];
+const required = ['web', 'rest', 'ws'];
+const usage = `--web=dir | --rest=dir [restT=template.yaml] | --ws=dir [wsT=template.yaml]`
 const servers = {};
 
 var argv = require('minimist')(process.argv.slice(2), {default: defaults});
@@ -21,8 +21,8 @@ if(!Object.keys(argv).every(e=>options.includes(e)) // only valid options
 				servers.web = {filesPath: argv.web};
 				break;
 			
-			case 'api':
-				servers.api = {filesPath: argv.api, templateName: argv.apiT};
+			case 'rest':
+				servers.rest = {filesPath: argv.rest, templateName: argv.restT};
 				break;
 
 			case 'ws':

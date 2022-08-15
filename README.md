@@ -2,7 +2,7 @@
 
 This repo was developed so I could locally test an app that consists of:
 - A static web site served from S3
-- An associated web API served by the API Gateway
+- An associated REST API served by the API Gateway
 - A Node JS client that uses a websocket served by API Gateway V2
 
 ## Notable Features
@@ -66,18 +66,18 @@ await postToConnection({
 
 ### Running the server
 
-```PORT=xxxx node localAwsGw.js --web=dir | --api=dir [apiT=template.yaml] | --ws=dir [wsT=template.yaml]```
+```PORT=xxxx node localAwsGw.js --web=dir | --rest=dir [restT=template.yaml] | --ws=dir [wsT=template.yaml]```
 
 ```PORT``` is where the server will listen.
 
 ```dir``` is the absolute or relative path to the respective server files.
 
-```apiT``` and ```apiT``` default to ```template.yaml``` but can be ```anything.[yaml|json|yml]```.
+```restT``` and ```wsT``` default to ```template.yaml``` but can be ```anything.[yaml|json|yml]```.
 
 Example:
 
 ```
-PORT=3000 node localAwsGw.js --web=s3Files --api=restApiFiles --ws=wsApiFiles
+PORT=3000 node localAwsGw.js --web=s3Files --rest=restApiFiles --ws=wsApiFiles --wsT=myTemplate.json
 ```
 
 ## Disclaimer
