@@ -35,7 +35,7 @@ let app = null;
 			case 'api':
 				app = app ? app : express(); //app if necessary
 				const {restApi} = await apiGwLambdas(servers.api);
-				if(restApi && Object.keys(restApi).length >= 0) {
+				if(restApi && Object.keys(restApi).length > 0) {
 					restApiGw(app, restApi);
 				} else {
 					console.error(`${process.argv[1].split('/').pop()}: no restApi`);
@@ -46,7 +46,7 @@ let app = null;
 			case 'ws':
 				if(!servers?.ws) break;
 				const {wsApi} = await apiGwLambdas(servers.ws);
-				if(wsApi && Object.keys(wsApi.routes).length >= 0) {
+				if(wsApi && Object.keys(wsApi.routes).length > 0) {
 					wsApiGw(httpServer, wsApi);
 				} else {
 					console.error(`${process.argv[1].split('/').pop()}: no wsApi`);
