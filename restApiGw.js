@@ -29,7 +29,7 @@ function restApiGw(app, restApi) {
 				verboseLevel: 0,
 				event: {
 					headers: req.headers, // Pass on request headers
-					body: req.body // Pass on request body
+					body: req.body //JSON.stringify(req.body) // Pass on request body
 				}
 			});
 
