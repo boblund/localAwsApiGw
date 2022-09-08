@@ -3,12 +3,11 @@
 'use strict';
 
 // Based on https://github.com/JamesKyburz/aws-lambda-ws-server
-// but uses https://steveholgado.com/aws-lambda-local-development/#creating-our-lambda-function
-// for lambda execution
 
-const lambdaLocal = require('lambda-local');
+const SourceIp = require('os').networkInterfaces().en0.find(e=>e.family == 'IPv4').address;
 
 function wsApiGw(httpServer, wsApi) {
+	const apiGw = new (require('./ApiGw'))(wsApi.routes);
 	const mappingKey = wsApi.mappingKey || 'action';
 
 	// Create web socket server on top of a regular http server
@@ -21,7 +20,10 @@ function wsApiGw(httpServer, wsApi) {
 	});
 
 	const clients = {};
-	const context = () => ({
+
+	// Local equivalent functions for AWS.ApiGatewayManagementApi.
+	// Add deleteConnection if required.
+	const clientContext = {
 		postToConnection ({Data, ConnectionId}) {
 			return new Promise((resolve, reject) => {
 				const ws = clients[ConnectionId];
@@ -35,22 +37,40 @@ function wsApiGw(httpServer, wsApi) {
 					reject(err);
 				}
 			})
+		},
+
+		getConnection({ConnectionId}) {
+			return new Promise((resolve, reject) => {
+				if(clients[ConnectionId]) {
+					resolve({
+						"ConnectedAt": new Date,
+						"Identity": {
+							SourceIp,
+							"UserAgent": null
+						},
+						"LastActiveAt": new Date()
+					})
+				} else {
+					reject({code: 'GoneException', message: 410});
+				}
+			})
 		}
-	});
+	};
 
 	wss.removeAllListeners('verifyClient');
 	wss.on('verifyClient', async (info, fn) => {
-		const result = await lambdaLocal.execute({
-			...wsApi.routes['$connect'],
-			timeoutMs: 1000*60,
-			verboseLevel: 0,
-			event: {
-				requestContext: {routeKey: '$connect', connectionId: info.req.headers['sec-websocket-key']},
-				headers: info.req.headers, // Pass on request headers
-				body: info.req.body // Pass on request body
-			}
-		});
-
+		const result = await apiGw.invoke(
+			'$connect',
+			{ //event
+				requestContext: {
+					routeKey: '$connect',
+					connectionId: info.req.headers['sec-websocket-key']
+				},
+				headers: info.req.headers,
+				body: info.req.body
+			},
+			{ clientContext } //context
+		);
 		fn(result.statusCode === 200, result.statusCode, result.body);
 	});
 
@@ -61,51 +81,49 @@ function wsApiGw(httpServer, wsApi) {
 		ws.on('close', async () => {
 			try {
 				delete clients[connectionId]
-				await lambdaLocal.execute({
-					...wsApi.routes['$disconnect'],
-					timeoutMs: 1000*60,
-					verboseLevel: 0,
-					event: {
-						requestContext: {routeKey: '$disconnect', connectionId: req.headers['sec-websocket-key']},
-						headers: req.headers, // Pass on request headers
-						body: req.body // Pass on request body
+				await apiGw.invoke(
+					'$disconnect',
+					{ //event
+						requestContext: {
+							routeKey: '$disconnect',
+							connectionId: req.headers['sec-websocket-key']
+						},
+						headers: req.headers,
+						body: req.body
 					}
-				});
+				);				
 			} catch (e) {
 				console.error(e);
 			}
 		})
 
 		ws.on('message', async message => {
-			let routeKey = null
-					, d = null
+			let routeKey = null;
+			let d = null;
 
 			try {
-				d = JSON.parse(message)
+				d = JSON.parse(message);
 			} catch(e) {
-				console.error('ws.on messgage error:', e.code, e.message)
-				await context().postToConnection({ error: 'Invalid JSON:' + message })
-				return
+				console.error('ws.on messgage error:', e.code, e.message);
+				await context().postToConnection({ error: 'Invalid JSON:' + message });
+				return;
 			}
 
-			routeKey = d[mappingKey] && wsApi.routes[d[mappingKey]] ? d[mappingKey] : '$default'
-			message = message.toString();
+			routeKey = d[mappingKey] && wsApi.routes[d[mappingKey]] ? d[mappingKey] : '$default';
 			try {
 				if(routeKey != '$default') {
-					await lambdaLocal.execute({
-						...wsApi.routes[routeKey],
-						timeoutMs: 1000*60,
-						verboseLevel: 0,
-						event: {
+					await apiGw.invoke(
+						routeKey,
+						{	//event
 							requestContext: {routeKey, connectionId: req.headers['sec-websocket-key']},
-							headers: req.headers, // Pass on request headers
-							body: message // Pass on request body
+							headers: req.headers,
+							body: message.toString()
 						},
-						clientContext: context()
-					});
+						{ clientContext }	//context
+					);
 				}        
 			} catch (e) {
-				console.error('ws server error:', e.code, e.message);
+				console.error('ws server error:', e.statusCode, e.body);
 			}
 		})
 	});

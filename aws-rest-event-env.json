@@ -1,0 +1,148 @@
+event: {
+	"resource": "/remainingsends",
+	"path": "/remainingsends",
+	"httpMethod": "GET",
+	"headers": {
+			"Accept-Encoding": "br,gzip",
+			"Authorization": "...",
+			"CloudFront-Forwarded-Proto": "https",
+			"CloudFront-Is-Desktop-Viewer": "true",
+			"CloudFront-Is-Mobile-Viewer": "false",
+			"CloudFront-Is-SmartTV-Viewer": "false",
+			"CloudFront-Is-Tablet-Viewer": "false",
+			"CloudFront-Viewer-ASN": "16509",
+			"CloudFront-Viewer-Country": "US",
+			"Host": "<API GW ID>.execute-api.<Region>.amazonaws.com",
+			"User-Agent": "Amazon CloudFront",
+			"Via": "2.0 1152d84b916a23e4b38cef1a20064b3e.cloudfront.net (CloudFront), 1.1 7f5e0d3b9ea85d0d75063a66c0ebc840.cloudfront.net (CloudFront)",
+			"X-Amz-Cf-Id": "...",
+			"X-Amzn-Trace-Id": "Root=1-63138982-249e49d5194c49fd47d2a795",
+			"X-Forwarded-For": "136.29.71.125, 64.252.72.8, 70.132.31.74",
+			"X-Forwarded-Port": "443",
+			"X-Forwarded-Proto": "https"
+	},
+	"multiValueHeaders": {
+			"Accept-Encoding": [
+					"br,gzip"
+			],
+			"Authorization": [
+					"..."
+			],
+			"CloudFront-Forwarded-Proto": [
+					"https"
+			],
+			"CloudFront-Is-Desktop-Viewer": [
+					"true"
+			],
+			"CloudFront-Is-Mobile-Viewer": [
+					"false"
+			],
+			"CloudFront-Is-SmartTV-Viewer": [
+					"false"
+			],
+			"CloudFront-Is-Tablet-Viewer": [
+					"false"
+			],
+			"CloudFront-Viewer-ASN": [
+					"16509"
+			],
+			"CloudFront-Viewer-Country": [
+					"US"
+			],
+			"Host": [
+					"<API GW ID>.execute-api.<Region>.amazonaws.com"
+			],
+			"User-Agent": [
+					"Amazon CloudFront"
+			],
+			"Via": [
+					"2.0 1152d84b916a23e4b38cef1a20064b3e.cloudfront.net (CloudFront), 1.1 7f5e0d3b9ea85d0d75063a66c0ebc840.cloudfront.net (CloudFront)"
+			],
+			"X-Amz-Cf-Id": [
+					"Ttnqg0Vrud_KrXqYSYNja-s8qKYxemmon0K_36J-GWwKGvWh0xTOdA=="
+			],
+			"X-Amzn-Trace-Id": [
+					"Root=1-63138982-249e49d5194c49fd47d2a795"
+			],
+			"X-Forwarded-For": [
+					"..."
+			],
+			"X-Forwarded-Port": [
+					"443"
+			],
+			"X-Forwarded-Proto": [
+					"https"
+			]
+	},
+	"queryStringParameters": null,
+	"multiValueQueryStringParameters": null,
+	"pathParameters": null,
+	"stageVariables": null,
+	"requestContext": {
+			"resourceId": "5ro4wb",
+			"authorizer": {
+					"claims": {...}
+			},
+			"resourcePath": "/remainingsends",
+			"httpMethod": "GET",
+			"extendedRequestId": "X5JsfGzwIAMFm4g=",
+			"requestTime": "03/Sep/2022:17:06:10 +0000",
+			"path": "/Prod/remainingsends",
+			"accountId": "...",
+			"protocol": "HTTP/1.1",
+			"stage": "Prod",
+			"domainPrefix": "<API GW ID>",
+			"requestTimeEpoch": 1662224770958,
+			"requestId": "82f0572b-c73b-403f-b142-404f9aed3177",
+			"identity": {
+					"cognitoIdentityPoolId": null,
+					"accountId": null,
+					"cognitoIdentityId": null,
+					"caller": null,
+					"sourceIp": "...",
+					"principalOrgId": null,
+					"accessKey": null,
+					"cognitoAuthenticationType": null,
+					"cognitoAuthenticationProvider": null,
+					"userArn": null,
+					"userAgent": "Amazon CloudFront",
+					"user": null
+			},
+			"domainName": "<API GW ID>.execute-api.<Region>.amazonaws.com",
+			"apiId": "<API GW ID>"
+	},
+	"body": null,
+	"isBase64Encoded": false
+}
+process.env: {
+	"AWS_LAMBDA_FUNCTION_VERSION": "$LATEST",
+	"AWS_SESSION_TOKEN": "...",
+	"LAMBDA_TASK_ROOT": "/var/task",
+	"AWS_LAMBDA_LOG_GROUP_NAME": "/aws/lambda/...",
+	"LD_LIBRARY_PATH": "/var/lang/lib:/lib64:/usr/lib64:/var/runtime:/var/runtime/lib:/var/task:/var/task/lib:/opt/lib",
+	"MEMBER_TABLE": "brume_members",
+	"AWS_LAMBDA_RUNTIME_API": "127.0.0.1:9001",
+	"AWS_LAMBDA_LOG_STREAM_NAME": "...",
+	"AWS_EXECUTION_ENV": "AWS_Lambda_nodejs14.x",
+	"AWS_LAMBDA_FUNCTION_NAME": "...",
+	"AWS_XRAY_DAEMON_ADDRESS": "169.254.79.129:2000",
+	"PATH": "/var/lang/bin:/usr/local/bin:/usr/bin/:/bin:/opt/bin",
+	"AWS_DEFAULT_REGION": "<Region>",
+	"PWD": "/var/task",
+	"AWS_SECRET_ACCESS_KEY": "...",
+	"LANG": "en_US.UTF-8",
+	"LAMBDA_RUNTIME_DIR": "/var/runtime",
+	"AWS_LAMBDA_INITIALIZATION_TYPE": "on-demand",
+	"NODE_PATH": "/opt/nodejs/node14/node_modules:/opt/nodejs/node_modules:/var/runtime/node_modules:/var/runtime:/var/task",
+	"TZ": ":UTC",
+	"AWS_REGION": "<Region>",
+	"AWS_ACCESS_KEY_ID": "...",
+	"SHLVL": "0",
+	"_AWS_XRAY_DAEMON_ADDRESS": "169.254.79.129",
+	"_AWS_XRAY_DAEMON_PORT": "2000",
+	"AWS_XRAY_CONTEXT_MISSING": "LOG_ERROR",
+	"_HANDLER": "app.lambdaHandler",
+	"AWS_LAMBDA_FUNCTION_MEMORY_SIZE": "128",
+	"NODE_EXTRA_CA_CERTS": "/etc/pki/tls/certs/ca-bundle.crt",
+	"_X_AMZN_TRACE_ID": "..."
+}

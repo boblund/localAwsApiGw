@@ -1,0 +1,259 @@
+$connect
+
+event: {
+    "headers": {
+        "Host": "<ApiID>.execute-api.<Region>.amazonaws.com",
+        "Sec-WebSocket-Extensions": "permessage-deflate; client_max_window_bits",
+        "Sec-WebSocket-Key": "W5SCfhFFgFVbFgGJ3cbbiA==",
+        "Sec-WebSocket-Version": "13",
+        "token": "<Token>",
+        "X-Amzn-Trace-Id": "Root=1-63127ba5-179e8dda69839d9b0e91e6eb",
+        "X-Forwarded-For": "<<SourceIP>>",
+        "X-Forwarded-Port": "443",
+        "X-Forwarded-Proto": "https"
+    },
+    "multiValueHeaders": {
+        "Host": [
+            "<ApiID>.execute-api.<Region>.amazonaws.com"
+        ],
+        "Sec-WebSocket-Extensions": [
+            "permessage-deflate; client_max_window_bits"
+        ],
+        "Sec-WebSocket-Key": [
+            "W5SCfhFFgFVbFgGJ3cbbiA=="
+        ],
+        "Sec-WebSocket-Version": [
+            "13"
+        ],
+        "token": [
+            "<Token>"
+        ],
+        "X-Amzn-Trace-Id": [
+            "Root=1-63127ba5-179e8dda69839d9b0e91e6eb"
+        ],
+        "X-Forwarded-For": [
+            "<<SourceIP>>"
+        ],
+        "X-Forwarded-Port": [
+            "443"
+        ],
+        "X-Forwarded-Proto": [
+            "https"
+        ]
+    },
+    "requestContext": {
+        "routeKey": "$connect",
+        "eventType": "CONNECT",
+        "extendedRequestId": "X2hB7HowIAMF53A=",
+        "requestTime": "02/Sep/2022:21:54:45 +0000",
+        "messageDirection": "IN",
+        "stage": "Prod",
+        "connectedAt": 1662155685708,
+        "requestTimeEpoch": 1662155685710,
+        "identity": {
+            "sourceIp": "<<SourceIP>>"
+        },
+        "requestId": "X2hB7HowIAMF53A=",
+        "domainName": "<ApiID>.execute-api.<Region>.amazonaws.com",
+        "connectionId": "X2hB7d6KoAMCLzA=",
+        "apiId": "<ApiID>"
+    },
+    "isBase64Encoded": false
+}
+
+context: {
+    "callbackWaitsForEmptyEventLoop": true,
+    "functionVersion": "$LATEST",
+    "functionName": "...",
+    "memoryLimitInMB": "256",
+    "logGroupName": "/aws/lambda/...",
+    "logStreamName": "2022/09/02/[$LATEST]49b7848353b941adaf9c83c21940b3b3",
+    "invokedFunctionArn": "arn:aws:lambda:<Region>:477605618392:function:...",
+    "awsRequestId": "c5a1a70a-9eea-4ee7-9667-7ea2d8481980"
+}
+
+process.env: {
+	"AWS_LAMBDA_FUNCTION_VERSION": "$LATEST",
+	"AWS_SESSION_TOKEN": "...",
+	"LAMBDA_TASK_ROOT": "/var/task",
+	"AWS_LAMBDA_LOG_GROUP_NAME": "...",
+	"LD_LIBRARY_PATH": "/var/lang/lib:/lib64:/usr/lib64:/var/runtime:/var/runtime/lib:/var/task:/var/task/lib:/opt/lib",
+	"AWS_LAMBDA_RUNTIME_API": "127.0.0.1:9001",
+	"AWS_LAMBDA_LOG_STREAM_NAME": "2022/09/02/[$LATEST]b1e45e10dfae4ed793d05cbc6f30bfcd",
+	"AWS_EXECUTION_ENV": "AWS_Lambda_nodejs14.x",
+	"AWS_XRAY_DAEMON_ADDRESS": "169.254.79.129:2000",
+	"AWS_LAMBDA_FUNCTION_NAME": "...",
+	"PATH": "/var/lang/bin:/usr/local/bin:/usr/bin/:/bin:/opt/bin",
+	"AWS_DEFAULT_REGION": "<Region>",
+	"PWD": "/var/task",
+	"AWS_SECRET_ACCESS_KEY": "...",
+	"LANG": "en_US.UTF-8",
+	"LAMBDA_RUNTIME_DIR": "/var/runtime",
+	"AWS_LAMBDA_INITIALIZATION_TYPE": "on-demand",
+	"NODE_PATH": "/opt/nodejs/node14/node_modules:/opt/nodejs/node_modules:/var/runtime/node_modules:/var/runtime:/var/task",
+	"TZ": ":UTC",
+	"AWS_REGION": "<Region>",
+	"AWS_ACCESS_KEY_ID": "ASIAW6M4DMLMD6744B5W",
+	"SHLVL": "0",
+	"_AWS_XRAY_DAEMON_ADDRESS": "169.254.79.129",
+	"_AWS_XRAY_DAEMON_PORT": "2000",
+	"AWS_XRAY_CONTEXT_MISSING": "LOG_ERROR",
+	"_HANDLER": "app.handler",
+	"AWS_LAMBDA_FUNCTION_MEMORY_SIZE": "256",
+	"NODE_EXTRA_CA_CERTS": "/etc/pki/tls/certs/ca-bundle.crt",
+	"_X_AMZN_TRACE_ID": "Root=1-63128538-4d8da0322d789d3e62581388;Parent=68b7d44815f89c77;Sampled=0"
+}
+
+Message
+
+event: {
+	"requestContext": {
+			"routeKey": "send",
+			"messageId": "X2hC6d_mIAMCLzA=",
+			"eventType": "MESSAGE",
+			"extendedRequestId": "X2hC6EjIoAMF6aA=",
+			"requestTime": "02/Sep/2022:21:54:52 +0000",
+			"messageDirection": "IN",
+			"stage": "Prod",
+			"connectedAt": 1662155685708,
+			"requestTimeEpoch": 1662155692033,
+			"identity": {
+					"sourceIp": "<<SourceIP>>"
+			},
+			"requestId": "X2hC6EjIoAMF6aA=",
+			"domainName": "<ApiID>.execute-api.<Region>.amazonaws.com",
+			"connectionId": "X2hB7d6KoAMCLzA=",
+			"apiId": "<ApiID>"
+	},
+	"body": "{}",
+	"isBase64Encoded": false
+}
+context: {
+	"callbackWaitsForEmptyEventLoop": true,
+	"functionVersion": "$LATEST",
+	"functionName": "...",
+	"memoryLimitInMB": "256",
+	"logGroupName": "/aws/lambda/...",
+	"logStreamName": "2022/09/02/[$LATEST]d4aa9c3a3c2b495694baad17c802136c",
+	"invokedFunctionArn": "arn:aws:lambda:<Region>:477605618392:function:...",
+	"awsRequestId": "a16107e3-6208-4700-a30e-1bb67ad53c3b"
+}
+
+process.env: {
+	"AWS_LAMBDA_FUNCTION_VERSION": "$LATEST",
+	"AWS_SESSION_TOKEN": "...",
+	"LD_LIBRARY_PATH": "/var/lang/lib:/lib64:/usr/lib64:/var/runtime:/var/runtime/lib:/var/task:/var/task/lib:/opt/lib",
+	"LAMBDA_TASK_ROOT": "/var/task",
+	"AWS_LAMBDA_LOG_GROUP_NAME": "...",
+	"AWS_LAMBDA_RUNTIME_API": "127.0.0.1:9001",
+	"AWS_LAMBDA_LOG_STREAM_NAME": "2022/09/02/[$LATEST]49d9d61248474b3989a7272707fdde49",
+	"AWS_EXECUTION_ENV": "AWS_Lambda_nodejs14.x",
+	"AWS_LAMBDA_FUNCTION_NAME": "...",
+	"AWS_XRAY_DAEMON_ADDRESS": "169.254.79.129:2000",
+	"PATH": "/var/lang/bin:/usr/local/bin:/usr/bin/:/bin:/opt/bin",
+	"AWS_DEFAULT_REGION": "<Region>",
+	"PWD": "/var/task",
+	"AWS_SECRET_ACCESS_KEY": "...",
+	"LAMBDA_RUNTIME_DIR": "/var/runtime",
+	"LANG": "en_US.UTF-8",
+	"AWS_LAMBDA_INITIALIZATION_TYPE": "on-demand",
+	"NODE_PATH": "/opt/nodejs/node14/node_modules:/opt/nodejs/node_modules:/var/runtime/node_modules:/var/runtime:/var/task",
+	"AWS_REGION": "<Region>",
+	"TZ": ":UTC",
+	"AWS_ACCESS_KEY_ID": "ASIAW6M4DMLMC5URRINU",
+	"SHLVL": "0",
+	"_AWS_XRAY_DAEMON_ADDRESS": "169.254.79.129",
+	"_AWS_XRAY_DAEMON_PORT": "2000",
+	"AWS_XRAY_CONTEXT_MISSING": "LOG_ERROR",
+	"_HANDLER": "app.handler",
+	"AWS_LAMBDA_FUNCTION_MEMORY_SIZE": "256",
+	"NODE_EXTRA_CA_CERTS": "/etc/pki/tls/certs/ca-bundle.crt",
+	"_X_AMZN_TRACE_ID": "Root=1-6312853e-73b99ddc5904d1f33ea9e71e;Parent=3568ab652e13786a;Sampled=0"
+}
+
+$disconnect
+
+event: {
+	"headers": {
+			"Host": "<ApiID>.execute-api.<Region>.amazonaws.com",
+			"x-api-key": "",
+			"X-Forwarded-For": "",
+			"x-restapi": ""
+	},
+	"multiValueHeaders": {
+			"Host": [
+					"<ApiID>.execute-api.<Region>.amazonaws.com"
+			],
+			"x-api-key": [
+					""
+			],
+			"X-Forwarded-For": [
+					""
+			],
+			"x-restapi": [
+					""
+			]
+	},
+	"requestContext": {
+			"routeKey": "$disconnect",
+			"disconnectStatusCode": 1006,
+			"eventType": "DISCONNECT",
+			"extendedRequestId": "X2hD8GkAoAMF-sw=",
+			"requestTime": "02/Sep/2022:21:54:58 +0000",
+			"messageDirection": "IN",
+			"disconnectReason": "Connection closed abnormally",
+			"stage": "Prod",
+			"connectedAt": 1662155685708,
+			"requestTimeEpoch": 1662155698663,
+			"identity": {
+					"sourceIp": "<<SourceIP>>"
+			},
+			"requestId": "X2hD8GkAoAMF-sw=",
+			"domainName": "<ApiID>.execute-api.<Region>.amazonaws.com",
+			"connectionId": "X2hB7d6KoAMCLzA=",
+			"apiId": "<ApiID>"
+	},
+	"isBase64Encoded": false
+}
+context: {
+	"callbackWaitsForEmptyEventLoop": true,
+	"functionVersion": "$LATEST",
+	"functionName": "...",
+	"memoryLimitInMB": "256",
+	"logGroupName": "/aws/lambda/...",
+	"logStreamName": "2022/09/02/[$LATEST]4bdb68e03e864a06b1060a64712752b9",
+	"invokedFunctionArn": "arn:aws:lambda:<Region>:477605618392:function:...",
+	"awsRequestId": "45f458db-a810-4942-859d-b350b7190133"
+}
+
+process.env: {
+	"AWS_LAMBDA_FUNCTION_VERSION": "$LATEST",
+	"AWS_SESSION_TOKEN": "...",
+	"LAMBDA_TASK_ROOT": "/var/task",
+	"LD_LIBRARY_PATH": "/var/lang/lib:/lib64:/usr/lib64:/var/runtime:/var/runtime/lib:/var/task:/var/task/lib:/opt/lib",
+	"AWS_LAMBDA_LOG_GROUP_NAME": "...",
+	"AWS_LAMBDA_RUNTIME_API": "127.0.0.1:9001",
+	"AWS_LAMBDA_LOG_STREAM_NAME": "2022/09/02/[$LATEST]231c5f014e0a401ead98fc3c39c1b398",
+	"AWS_EXECUTION_ENV": "AWS_Lambda_nodejs14.x",
+	"AWS_XRAY_DAEMON_ADDRESS": "169.254.79.129:2000",
+	"AWS_LAMBDA_FUNCTION_NAME": "...",
+	"PATH": "/var/lang/bin:/usr/local/bin:/usr/bin/:/bin:/opt/bin",
+	"AWS_DEFAULT_REGION": "<Region>",
+	"PWD": "/var/task",
+	"AWS_SECRET_ACCESS_KEY": "...",
+	"LANG": "en_US.UTF-8",
+	"LAMBDA_RUNTIME_DIR": "/var/runtime",
+	"AWS_LAMBDA_INITIALIZATION_TYPE": "on-demand",
+	"NODE_PATH": "/opt/nodejs/node14/node_modules:/opt/nodejs/node_modules:/var/runtime/node_modules:/var/runtime:/var/task",
+	"AWS_REGION": "<Region>",
+	"TZ": ":UTC",
+	"AWS_ACCESS_KEY_ID": "ASIAW6M4DMLMLRBWN3ZR",
+	"SHLVL": "0",
+	"_AWS_XRAY_DAEMON_ADDRESS": "169.254.79.129",
+	"_AWS_XRAY_DAEMON_PORT": "2000",
+	"AWS_XRAY_CONTEXT_MISSING": "LOG_ERROR",
+	"_HANDLER": "app.handler",
+	"AWS_LAMBDA_FUNCTION_MEMORY_SIZE": "256",
+	"NODE_EXTRA_CA_CERTS": "/etc/pki/tls/certs/ca-bundle.crt",
+	"_X_AMZN_TRACE_ID": "Root=1-63128547-6834a1442f35565664367d5e;Parent=42c95bef4aa2a15c;Sampled=0"
+}
