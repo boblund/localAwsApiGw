@@ -28,27 +28,16 @@ npm install
 ### Set up default lambda environment
 
 A lambda's execution environment consists of: process.env and the event and context parameters. These are defined, in part, by the SAM/Cloudformation template. Other values may be required and can be added:
-- process.env: Change ```baseEnv``` in ApiGw.js.
+- process.env: The lambda's process.env is set in the following order:
+	- The lambda's template environment variables.
+	- The contents of localGwEnv.js.
+	- Local process environment variables that are present in either of the two above.
 - event and context: Modify ```event``` and ```context``` ```apiGw.invoke``` arguments in restApiGw.js or wsApiGw.js as required. The files ```aws-rest-event-env.json``` and ```aws-ws-event-context.json``` show the AWS default values for process.env, event and context.
 
 ### Modify Websocket lambda functions if necessary
 
-In most cases REST lambda integrations can be used as is with localAwsApiGw. Certain cases, e.g. Stripe webhook handling require being aware of running locally, i.e.:
-```
-if(!process.env.LOCAL_AWS_GW) {
-	try {
-		event = stripe.webhooks.constructEvent(event.body, sig,
-			process.env.STRIPE_WEBHOOK_SECRET);
-	} catch (err) {
-		//process error
-	} 
-} else {
-	event = event.body;
-}
-```
-
 Websocket lambda integrations need to be modified to detect when running locally to use local versions of
-```AWS.ApiGatewayManagementApi.postToConnection().promise()``` and ```AWS.ApiGatewayManagementApi.getConnection().promise()```. 
+```AWS.ApiGatewayManagementApi.postToConnection().promise()``` and ```AWS.ApiGatewayManagementApi.getConnection().promise()```.
 
 For example:
 ```
@@ -69,7 +58,9 @@ await postToConnection({
 
 ### Running the server
 
-```PORT=xxxx node localAwsGw.js --web=dir | --rest=dir [restT=template.yaml] | --ws=dir [wsT=template.yaml]```
+```SOME_VAR=xxx PORT=yyy node localAwsGw.js --web=dir | --rest=dir [restT=template.yaml] | --ws=dir [wsT=template.yaml]```
+
+```SOME_VAR``` is a lambda environment variable to override
 
 ```PORT``` is where the server will listen.
 
