@@ -8,7 +8,14 @@ const express = require('express');
 const bodyParser = require('body-parser');
 
 function restApiGw(app, restApi) {
-	app.use(bodyParser.json())
+	app.use((req, res, next) => {
+		if (req.originalUrl === '/api/webhook') {
+			bodyParser.raw({ type: 'application/json' })(req, res, next);
+		} else {
+			bodyParser.json()(req, res, next);
+		}
+	});
+
 	app.use(bodyParser.urlencoded({ extended: true }))
 	app.use(express.text());
 	app.use(require('cors')());
