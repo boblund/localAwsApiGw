@@ -1,15 +1,16 @@
 'use strict';
 
-const baseEnv = {
-	AWS_REGION: 'us-east-1',
-	LOCAL_AWS_GW: true
-};
+const localEnv = require('./localGwEnv');
 
 function ApiGw(apis) {
 	const lambdas = {};
 	const savedProcessEnv = process.env; // Save callers environment
 	for(const api in apis) {
-		process.env = {...apis[api].environment, ...baseEnv}; // Environment for lambda
+		process.env = {...apis[api].environment, ...localEnv}; // Environment for lambda
+		for(const envVar in process.env) {
+			// Override any template and default variables with any set in the process' envionemt
+			process.env[envVar] = savedProcessEnv[envVar] ? savedProcessEnv[envVar] : process.env[envVar];
+		}
 		lambdas[api] = { // Import lambda in its environment
 			env: process.env,
 			lambdaFunc: (require(apis[api].lambdaPath))[apis[api].lambdaHandler]
