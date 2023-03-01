@@ -81,3 +81,7 @@ I use this for testing my project with two SAM templates for the REST API and We
 ## Acknowledgements
 
 Parts of the implementation are based on others' work with approriate links in the code.
+
+## License <a name="license"></a>
+
+Creative Commons Attribution-NonCommercial 4.0 International
