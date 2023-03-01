@@ -22,7 +22,7 @@ cd localAwsApiGw
 npm install
 ```
 
-Use of HTTPS requires configuring the appropriate key and self-signed certificate. The following ```openssl``` command can be used:
+Use of HTTPS requires configuring the appropriate key and self-signed certificate in the directory where ```localAwsGw``` is running. The following ```openssl``` command can be used:
 
 ```
 openssl req -x509 -newkey rsa:4096 -keyout <hostname>.key -out <hostname>.cert -sha256 -days <cert expirary> -nodes
