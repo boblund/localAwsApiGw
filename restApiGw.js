@@ -16,7 +16,7 @@ function restApiGw(app, restApi) {
 		}
 	});
 
-	app.use(bodyParser.urlencoded({ extended: true }))
+	app.use(bodyParser.urlencoded({ extended: true }));
 	app.use(express.text());
 	app.use(require('cors')());
 
@@ -34,7 +34,7 @@ function restApiGw(app, restApi) {
 			.status(result.statusCode ? result.statusCode : 500)
 			.set(result?.headers)
 			.end(result.body ? result.body  : result.message);
-	})
+	});
 }
 
-module.exports = restApiGw
+module.exports = restApiGw;

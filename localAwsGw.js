@@ -6,17 +6,26 @@
 // Based on https://stackoverflow.com/a/34838031/6996491.
 
 const express = require('express');
+const fs = require('fs');
+const os = require('os');
 const restApiGw = require('./restApiGw.js');
 const wsApiGw = require('./wsApiGw.js');
 const apiGwLambdas = require('./apiGwLambdas.js');
 const {existsSync} = require('fs');
+const hostName = os.hostname(); //'bobsm1.local';
 
 const servers = require('./cmdLineParse.js'); //process command line
 if(Object.keys(servers).length == 0) {
 	process.exit(1);
 }
 
-const httpServer = require('http').createServer();
+const httpServer = process.env.HTTPS
+	? require('https').createServer({
+		key: fs.readFileSync(`${hostName}.key`),
+		cert: fs.readFileSync(`${hostName}.cert`)
+	})
+	: require('http').createServer();
+
 let app = null;
 
 (async () => {
@@ -60,4 +69,4 @@ let app = null;
 	httpServer.listen(process.env.PORT, function() {
 		console.log(`${process.argv[1].split('/').pop()} server listening on ${process.env.PORT}`);
 	});
-})()
+})();

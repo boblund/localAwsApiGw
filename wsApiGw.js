@@ -5,6 +5,7 @@
 // Based on https://github.com/JamesKyburz/aws-lambda-ws-server
 
 const SourceIp = require('os').networkInterfaces().en0.find(e=>e.family == 'IPv4').address;
+const url = require('url');
 
 function wsApiGw(httpServer, wsApi) {
 	const apiGw = new (require('./ApiGw'))(wsApi.routes);
@@ -15,7 +16,7 @@ function wsApiGw(httpServer, wsApi) {
 	const wss = new wsServer({
 		server: httpServer,
 		verifyClient (info, fn) {
-			wss.emit('verifyClient', info, fn)
+			wss.emit('verifyClient', info, fn);
 		}
 	});
 
@@ -29,14 +30,14 @@ function wsApiGw(httpServer, wsApi) {
 				const ws = clients[ConnectionId];
 				if (ws) {
 					ws.send(Data, err => {
-						(err ? reject(err) : resolve())
-					})
+						(err ? reject(err) : resolve());
+					});
 				} else {
 					const err = new Error('Unknown client:', ConnectionId);
 					err.statusCode = 410;
 					reject(err);
 				}
-			})
+			});
 		},
 
 		getConnection({ConnectionId}) {
@@ -49,16 +50,17 @@ function wsApiGw(httpServer, wsApi) {
 							"UserAgent": null
 						},
 						"LastActiveAt": new Date()
-					})
+					});
 				} else {
 					reject({code: 'GoneException', message: 410});
 				}
-			})
+			});
 		}
 	};
 
 	wss.removeAllListeners('verifyClient');
 	wss.on('verifyClient', async (info, fn) => {
+		//const qString = url.parse(info.req.url,true).query;
 		const result = await apiGw.invoke(
 			'$connect',
 			{ //event
@@ -66,7 +68,10 @@ function wsApiGw(httpServer, wsApi) {
 					routeKey: '$connect',
 					connectionId: info.req.headers['sec-websocket-key']
 				},
-				headers: info.req.headers,
+				headers: {
+					...info.req.headers,
+					queryStringParameters: url.parse(info.req.url,true).query
+				},
 				body: info.req.body
 			},
 			{ clientContext } //context
@@ -78,9 +83,11 @@ function wsApiGw(httpServer, wsApi) {
 		const connectionId = req.headers['sec-websocket-key'];
 		clients[connectionId] = ws;
 
+		ws.on('ping', d => {console.log(`ping ${d}`);});
+
 		ws.on('close', async () => {
 			try {
-				delete clients[connectionId]
+				delete clients[connectionId];
 				await apiGw.invoke(
 					'$disconnect',
 					{ //event
@@ -95,7 +102,7 @@ function wsApiGw(httpServer, wsApi) {
 			} catch (e) {
 				console.error(e);
 			}
-		})
+		});
 
 		ws.on('message', async message => {
 			let routeKey = null;
@@ -105,7 +112,7 @@ function wsApiGw(httpServer, wsApi) {
 				d = JSON.parse(message);
 			} catch(e) {
 				console.error('ws.on messgage error:', e.code, e.message);
-				await context().postToConnection({ error: 'Invalid JSON:' + message });
+				await clientContext.postToConnection({ error: 'Invalid JSON:' + message });
 				return;
 			}
 
@@ -125,7 +132,7 @@ function wsApiGw(httpServer, wsApi) {
 			} catch (e) {
 				console.error('ws server error:', e.statusCode, e.body);
 			}
-		})
+		});
 	});
 }
 
