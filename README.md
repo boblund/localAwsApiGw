@@ -16,9 +16,8 @@ This repo was developed so I could locally test an app that consists of:
 
 ## Installation
 
-Clone github.com/boblund/localAwsApiGw
-
 ```
+git clone git@github.com:boblund/localAwsApiGw.git
 cd localAwsApiGw
 npm install
 ```
@@ -32,7 +31,9 @@ A lambda's execution environment consists of: process.env and the event and cont
 	- The lambda's template environment variables.
 	- The contents of localGwEnv.js.
 	- Local process environment variables that are present in either of the two above.
-- event and context: Modify ```event``` and ```context``` ```apiGw.invoke``` arguments in restApiGw.js or wsApiGw.js as required. The files ```aws-rest-event-env.json``` and ```aws-ws-event-context.json``` show the AWS default values for process.env, event and context.
+- event and context: Modify ```event``` and ```context``` ```apiGw.invoke``` arguments in restApiGw.js or wsApiGw.js as required.
+
+The files ```aws-rest-event-env.json``` and ```aws-ws-event-context.json``` show the AWS default values for process.env, event and context.
 
 ### Modify Websocket lambda functions if necessary
 
@@ -64,14 +65,17 @@ await postToConnection({
 
 ```PORT``` is where the server will listen.
 
-```dir``` is the absolute or relative path to the respective server files.
+```dir``` is the absolute or relative path to the server files:
+- ```--web``` static web pages
+- ```--api``` REST api files
+- ```--ws``` websocket api files
 
 ```restT``` and ```wsT``` default to ```template.yaml``` but can be ```anything.[yaml|json|yml]```.
 
 Example:
 
 ```
-PORT=3000 node localAwsGw.js --web=s3Files --rest=restApiFiles --ws=wsApiFiles --wsT=myTemplate.json
+PORT=3000 node localAwsGw.js --web=webPageFiles --rest=restApiFiles --ws=wsApiFiles --wsT=myTemplate.json
 ```
 
 ## Disclaimer
