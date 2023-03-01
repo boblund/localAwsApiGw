@@ -22,6 +22,20 @@ cd localAwsApiGw
 npm install
 ```
 
+Use of HTTPS requires configuring the appropriate key and self-signed certificate. The following ```openssl``` command can be used:
+
+```
+openssl req -x509 -newkey rsa:4096 -keyout <hostname>.key -out <hostname>.cert -sha256 -days <cert expirary> -nodes
+```
+
+Where <hostname> is hostname where ```localAwsGw``` is running. For example
+
+```
+openssl req -x509 -newkey rsa:4096 -keyout pi.local.key -out pi.local.cert -sha256 -days 3650 -nodes
+```
+
+Creates ```pi.local.key``` and ```pi.local.cert``` files containing the key and certificate for ```pi.local``` that expire in 3650 days.
+
 ## Use
 
 ### Set up default lambda environment
