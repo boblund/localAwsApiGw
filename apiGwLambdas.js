@@ -56,46 +56,45 @@ async function apiGwLambdas({filesPath, templateName}) {
 		}
 	}
 
-	var CodeUri, Handler, Environment, Api, ApiKey, Routes;
+	var CodeUri, Handler, Environment, Api, ApiKey, Routes, Method;
 
 	for(let resourceName in template.Resources) {
 		let resource = template.Resources[resourceName];
 
-		if(resource.Type == 'AWS::Serverless::Api'){
+		switch(true) {
+			case resource.Type == 'AWS::Serverless::Api':
+				apis.restApi = {};
+				continue;
 
-			apis.restApi = {};
-			continue;
+			case resource.Type == "AWS::Serverless::Function" && resource.Properties.Events != undefined:
+				let Events;
+				({CodeUri, Handler, Environment, Events} = resource.Properties);
+				ApiKey = Events[Object.keys(Events)[0]].Properties.Path;
+				Method = Events[Object.keys(Events)[0]].Properties.Method;
+				Routes = apis.restApi;
+				break;
 
-		} else if(resource.Type == "AWS::Serverless::Function" && resource.Properties.Events) {
+			case resource.Type == 'AWS::ApiGatewayV2::Api' && resource.Properties.ProtocolType == 'WEBSOCKET':
+				apis.wsApi={};
+				apis.wsApi.mappingKey = resource.Properties.RouteSelectionExpression.split('.')[2];
+				apis.wsApi.routes = {};
+				continue;
 
-			let Events;
-			({CodeUri, Handler, Environment, Events} = resource.Properties);
-			ApiKey = Events[Object.keys(Events)[0]].Properties.Path;
-			Routes = apis.restApi; //restApi;
+			case resource.Type == "AWS::ApiGatewayV2::Route":
+				const integName = resourceName.match(/(^.*)Route/)[1]+'Integ';
+				const integFunction = template.Resources[integName].Properties
+					.IntegrationUri['Fn::Sub'].match(/^.*functions\/\$\{(.*)\.Arn.*/)[1];
+				({CodeUri, Handler, Environment} = template.Resources[integFunction].Properties);
+				ApiKey = resource.Properties.RouteKey;
+				Routes = apis.wsApi.routes;
+				break;
 
-		} else if(resource.Type == 'AWS::ApiGatewayV2::Api' && resource.Properties.ProtocolType == 'WEBSOCKET') {
-
-			apis.wsApi={};
-			apis.wsApi.mappingKey = resource.Properties.RouteSelectionExpression.split('.')[2];
-			apis.wsApi.routes = {};
-			continue;
-
-		} else if(resource.Type == "AWS::ApiGatewayV2::Route") {
-
-			const integName = resourceName.match(/(^.*)Route/)[1]+'Integ';
-			const integFunction = template.Resources[integName].Properties
-				.IntegrationUri['Fn::Sub'].match(/^.*functions\/\$\{(.*)\.Arn.*/)[1];
-			({CodeUri, Handler, Environment} = template.Resources[integFunction].Properties);
-			ApiKey = resource.Properties.RouteKey;
-			Routes = apis.wsApi.routes;
-
-		} else {
-
-			continue;
+			default:
+				continue;
 		}
 
 		const [app, lambdaHandler] = Handler.split('.');
-		const environment = Environment.Variables;
+		const environment = Environment?.Variables ? Environment?.Variables : {};
 	
 		for(let envVar in environment) {
 			environment[envVar] = environment[envVar].Ref
@@ -104,19 +103,19 @@ async function apiGwLambdas({filesPath, templateName}) {
 					? environment[envVar]['Fn::Sub']
 					: environment[envVar];
 		}
-	
-		Routes[ApiKey] = {
-			lambdaPath: join(filesPath, CodeUri, app),
-			lambdaHandler,
-			environment
-		};
 
+		Routes[ApiKey] = Routes[ApiKey] ? Routes[ApiKey] : [];
+		Routes[ApiKey].push({
+			method: Method ? Method.toUpperCase() : 'WEBSOCKET',
+			route: {
+				lambdaPath: join(filesPath, CodeUri, app),
+				lambdaHandler,
+				environment
+			}
+		});
 	}
 
-	return apis; /*{
-		restApi: (Object.keys(restApi).length == 0) ? null : restApi,
-		wsApi: (Object.keys(wsApi).length == 0) ? null : wsApi
-	};*/
+	return apis;
 }
 
 module.exports = apiGwLambdas;

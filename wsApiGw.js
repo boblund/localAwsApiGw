@@ -63,6 +63,7 @@ function wsApiGw(httpServer, wsApi) {
 		//const qString = url.parse(info.req.url,true).query;
 		const result = await apiGw.invoke(
 			'$connect',
+			'WEBSOCKET',
 			{ //event
 				requestContext: {
 					routeKey: '$connect',
@@ -90,6 +91,7 @@ function wsApiGw(httpServer, wsApi) {
 				delete clients[connectionId];
 				await apiGw.invoke(
 					'$disconnect',
+					'WEBSOCKET',
 					{ //event
 						requestContext: {
 							routeKey: '$disconnect',
@@ -121,6 +123,7 @@ function wsApiGw(httpServer, wsApi) {
 				if(routeKey != '$default') {
 					await apiGw.invoke(
 						routeKey,
+						'WEBSOCKET',
 						{	//event
 							requestContext: {routeKey, connectionId: req.headers['sec-websocket-key']},
 							headers: req.headers,

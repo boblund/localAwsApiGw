@@ -24,8 +24,10 @@ function restApiGw(app, restApi) {
 
 	app.use('/api/*', async (req, res) => {
 		let route = req.baseUrl.replace(/^\/[^/]*\//, "/");
+		// invoke should consider reg.method
 		const result = await apiGw.invoke(
 			route,
+			req.method,
 			{headers: req.headers, body: req.body}	//event
 		);
 
