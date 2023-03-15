@@ -26,6 +26,20 @@ const httpServer = process.env.HTTPS
 	})
 	: require('http').createServer();
 
+const portRange = [ 10000, 60000 ];
+function generatePort() {return (Math.floor(Math.random() * (portRange[1] - portRange[0] + 1)) + portRange[0]);}
+
+function listen(server) {
+	return new Promise((res, rej) => {
+		const port = process.env.PORT ? process.env.PORT : generatePort();
+		//console.error(`localAwsGw port: ${port}`);
+		server.listen(port, function() { res(port); })
+			.on('error', e => {
+				rej(e);
+			});
+	});
+}
+
 let app = null;
 
 (async () => {
@@ -66,7 +80,20 @@ let app = null;
 	}
 
 	if(app) httpServer.on('request', app); // Mount the app if it exists
-	httpServer.listen(process.env.PORT, function() {
+	/*httpServer.listen(process.env.PORT, function() {
 		console.log(`${process.argv[1].split('/').pop()} server listening on ${process.env.PORT}`);
-	});
+	});*/
+
+	let port = null;
+	while(true) {
+		try {
+			if(port = await listen(httpServer))
+				break;
+		} catch(e){
+			if(e.code == 'EADDRINUSE') continue;
+			console.error(`server error: ${e.code}`);
+			process.exit(1);
+		}
+	}
+	process.stdout.write(`${process.argv[1].split('/').pop()} server listening on ${port}\n`);
 })();
