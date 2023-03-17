@@ -61,12 +61,19 @@ async function apiGwLambdas({filesPath, templateName}) {
 	for(let resourceName in template.Resources) {
 		let resource = template.Resources[resourceName];
 
-		switch(true) {
-			case resource.Type == 'AWS::Serverless::Api':
+		let resourceType = (resource.Type == 'AWS::Serverless::Api' || resource.Type == 'localAWSGw::RestApi') ? 'RestApi'
+			: (resource.Type == ("AWS::Serverless::Function" && resource.Properties.Events != undefined)) || resource.Type == 'localAWSGw::Function' ? 'Lambda'
+				: ((resource.Type == 'AWS::ApiGatewayV2::Api' && resource.Properties.ProtocolType == 'WEBSOCKET') || resource.Type == 'localAWSGw::WsApi') ? 'WsApi'
+					: (resource.Type == "AWS::ApiGatewayV2::Route" || resource.Type == 'localAWSGw::Route') ? 'WsRoute' : 'undefined';
+
+		switch(true){//(resourceType) {
+			case (resource.Type == 'AWS::Serverless::Api' || resource.Type == 'localAWSGw::RestApi'):
+			//case 'RestApi':
 				apis.restApi = {};
 				continue;
 
-			case resource.Type == "AWS::Serverless::Function" && resource.Properties.Events != undefined:
+			case (resource.Type == ("AWS::Serverless::Function" && resource.Properties.Events != undefined)) || resource.Type == 'localAWSGw::Function':
+			//case 'Lambda':
 				let Events;
 				({CodeUri, Handler, Environment, Events} = resource.Properties);
 				ApiKey = Events[Object.keys(Events)[0]].Properties.Path;
@@ -74,13 +81,15 @@ async function apiGwLambdas({filesPath, templateName}) {
 				Routes = apis.restApi;
 				break;
 
-			case resource.Type == 'AWS::ApiGatewayV2::Api' && resource.Properties.ProtocolType == 'WEBSOCKET':
+			case ((resource.Type == 'AWS::ApiGatewayV2::Api' && resource.Properties.ProtocolType == 'WEBSOCKET') || resource.Type == 'localAWSGw::WsApi'):
+			//case 'WsApi':
 				apis.wsApi={};
 				apis.wsApi.mappingKey = resource.Properties.RouteSelectionExpression.split('.')[2];
 				apis.wsApi.routes = {};
 				continue;
 
-			case resource.Type == "AWS::ApiGatewayV2::Route":
+			case (resource.Type == "AWS::ApiGatewayV2::Route" || resource.Type == 'localAWSGw::Route'):
+			//case 'WsRoute':
 				const integName = resourceName.match(/(^.*)Route/)[1]+'Integ';
 				const integFunction = template.Resources[integName].Properties
 					.IntegrationUri['Fn::Sub'].match(/^.*functions\/\$\{(.*)\.Arn.*/)[1];
@@ -94,7 +103,7 @@ async function apiGwLambdas({filesPath, templateName}) {
 		}
 
 		const [app, lambdaHandler] = Handler.split('.');
-		const environment = Environment?.Variables ? Environment?.Variables : {};
+		const environment = Environment?.Variables; // ? Environment?.Variables : {};
 	
 		for(let envVar in environment) {
 			environment[envVar] = environment[envVar].Ref
@@ -108,6 +117,7 @@ async function apiGwLambdas({filesPath, templateName}) {
 		Routes[ApiKey].push({
 			method: Method ? Method.toUpperCase() : 'WEBSOCKET',
 			route: {
+				type: resource.Type,
 				lambdaPath: join(filesPath, CodeUri, app),
 				lambdaHandler,
 				environment

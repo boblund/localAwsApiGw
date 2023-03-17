@@ -1,3 +1,5 @@
+#!/usr/bin/env node
+
 // License: Creative Commons Attribution-NonCommercial 4.0 International
 
 'use strict';
