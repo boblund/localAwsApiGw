@@ -10,7 +10,7 @@ const ssm = new (require('aws-sdk')).SSM({region: 'us-east-1'});
 
 async function apiGwLambdas({filesPath, templateName}) {
 	let apis = {};
-	const templatePath = join(filesPath, templateName);
+	const templatePath = join(filesPath, templateName); //`${filesPath}/${templateName}`;
 	let template = '';
 
 	switch (templatePath.split('.').pop()) {
@@ -33,12 +33,12 @@ async function apiGwLambdas({filesPath, templateName}) {
 				break;
 
 			} catch(e) {
-				console.error(`apiGwLambdas: error parsing ${templatePath}`);
+				console.error(`apiGwLambdas: error parsing ${templatePath} ${e}`);
 				return apis;
 			}
 		
 		default:
-			console.error(`apiGwLambdas: error parsing ${templatePath}`);
+			console.error(`apiGwLambdas: unknown template extension ${templatePath.split('.').pop()}`);
 			return apis;
 	}
 

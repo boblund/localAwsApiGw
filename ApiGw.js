@@ -1,6 +1,9 @@
 'use strict';
 
-const localEnv = require('./localGwEnv');
+const localEnv = (()=>{
+	try{ return require('./localGwEnv.js');
+	}catch(e){ return {}; }
+})();
 
 function ApiGw(apis) {
 	const lambdas = {};
@@ -17,7 +20,7 @@ function ApiGw(apis) {
 				method: apiEntry.method,
 				lambda: { // Import lambda in its environment
 					env: process.env,
-					lambdaFunc: (require(`${apiEntry.route.lambdaPath}.js`))[apiEntry.route.lambdaHandler]
+					lambdaFunc: (require(apiEntry.route.lambdaPath))[apiEntry.route.lambdaHandler]
 				}
 			});
 		};
