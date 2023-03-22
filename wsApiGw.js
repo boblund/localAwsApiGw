@@ -4,12 +4,23 @@
 
 // Based on https://github.com/JamesKyburz/aws-lambda-ws-server
 
-const SourceIp = require('os').networkInterfaces().en0.find(e=>e.family == 'IPv4').address;
 const url = require('url');
 
+function findIP() {
+	const interfaces = require('os').networkInterfaces();
+	for(const iface of Object.keys(interfaces)){
+		for(const e of interfaces[iface]) {
+			if(e.family == 'IPv4' && !(e.internal)) return e.address;
+		}
+	}
+	return null;
+}
+
 function wsApiGw(httpServer, wsApi) {
-	const apiGw = new (require('./ApiGw'))(wsApi.routes);
-	const mappingKey = wsApi.mappingKey || 'action';
+	const apiGw = new (require('./ApiGw'))(wsApi.routes),
+		mappingKey = wsApi.mappingKey || 'action',
+		SourceIp = findIP(); //require('os').networkInterfaces().en0.find(e=>e.family == 'IPv4').address;
+
 
 	// Create web socket server on top of a regular http server
 	const wsServer = require('ws').Server;
