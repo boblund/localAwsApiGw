@@ -62,17 +62,17 @@ async function apiGwLambdas({filesPath, templateName}) {
 		let resource = template.Resources[resourceName];
 
 		let resourceType = (resource.Type == 'AWS::Serverless::Api' || resource.Type == 'localAWSGw::RestApi') ? 'RestApi'
-			: (resource.Type == ("AWS::Serverless::Function" && resource.Properties.Events != undefined)) || resource.Type == 'localAWSGw::Function' ? 'Lambda'
+			: (resource.Type == "AWS::Serverless::Function" && resource.Properties.Events != undefined) || resource.Type == 'localAWSGw::Function' ? 'Lambda'
 				: ((resource.Type == 'AWS::ApiGatewayV2::Api' && resource.Properties.ProtocolType == 'WEBSOCKET') || resource.Type == 'localAWSGw::WsApi') ? 'WsApi'
 					: (resource.Type == "AWS::ApiGatewayV2::Route" || resource.Type == 'localAWSGw::Route') ? 'WsRoute' : 'undefined';
 
 		switch(true){//(resourceType) {
-			case (resource.Type == 'AWS::Serverless::Api' || resource.Type == 'localAWSGw::RestApi'):
+			case resource.Type == 'AWS::Serverless::Api':
 			//case 'RestApi':
 				apis.restApi = {};
 				continue;
 
-			case (resource.Type == ("AWS::Serverless::Function" && resource.Properties.Events != undefined)) || resource.Type == 'localAWSGw::Function':
+			case resource.Type == "AWS::Serverless::Function" && resource.Properties.Events != undefined:
 			//case 'Lambda':
 				let Events;
 				({CodeUri, Handler, Environment, Events} = resource.Properties);
@@ -81,14 +81,14 @@ async function apiGwLambdas({filesPath, templateName}) {
 				Routes = apis.restApi;
 				break;
 
-			case ((resource.Type == 'AWS::ApiGatewayV2::Api' && resource.Properties.ProtocolType == 'WEBSOCKET') || resource.Type == 'localAWSGw::WsApi'):
+			case resource.Type == 'AWS::ApiGatewayV2::Api' && resource.Properties.ProtocolType == 'WEBSOCKET':
 			//case 'WsApi':
 				apis.wsApi={};
 				apis.wsApi.mappingKey = resource.Properties.RouteSelectionExpression.split('.')[2];
 				apis.wsApi.routes = {};
 				continue;
 
-			case (resource.Type == "AWS::ApiGatewayV2::Route" || resource.Type == 'localAWSGw::Route'):
+			case resource.Type == "AWS::ApiGatewayV2::Route":
 			//case 'WsRoute':
 				const integName = resourceName.match(/(^.*)Route/)[1]+'Integ';
 				const integFunction = template.Resources[integName].Properties
