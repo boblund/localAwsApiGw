@@ -6,7 +6,7 @@ const jsYaml = require('js-yaml');
 const { schema } = require('yaml-cfn');
 const {readFileSync} = require('fs');
 const {join} = require('path');
-const ssm = new (require('aws-sdk')).SSM({region: 'us-east-1'});
+//const ssm = new (require('aws-sdk')).SSM({region: 'us-east-1'});
 
 async function apiGwLambdas({filesPath, templateName}) {
 	let apis = {};
@@ -98,12 +98,18 @@ async function apiGwLambdas({filesPath, templateName}) {
 				Routes = apis.wsApi.routes;
 				break;
 
+			case resource.Type == "WUI::Route":
+				//case 'WsRoute':
+				({CodeUri, Handler, Environment} = template.Resources[resource.Properties.IntegrationUri].Properties);
+				ApiKey = resource.Properties.RouteKey;
+				Routes = apis.wsApi.routes;
+				break;
 			default:
 				continue;
 		}
 
 		const [app, lambdaHandler] = Handler.split('.');
-		const environment = Environment?.Variables; // ? Environment?.Variables : {};
+		const environment = Environment?.Variables ? Environment.Variables : {};
 	
 		for(let envVar in environment) {
 			environment[envVar] = environment[envVar].Ref
