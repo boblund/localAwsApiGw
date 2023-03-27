@@ -1,40 +1,29 @@
 // License: Creative Commons Attribution-NonCommercial 4.0 International
+// Based on https://github.com/JamesKyburz/aws-lambda-ws-server
 
 'use strict';
 
-// Based on https://github.com/JamesKyburz/aws-lambda-ws-server
-
-const url = require('url');
-
-function findIP() {
-	const interfaces = require('os').networkInterfaces();
-	for(const iface of Object.keys(interfaces)){
-		for(const e of interfaces[iface]) {
-			if(e.family == 'IPv4' && !(e.internal)) return e.address;
+const url = require('url'),
+	SourceIp = (() => {
+		const interfaces = require('os').networkInterfaces();
+		for(const iface of Object.keys(interfaces)){
+			for(const e of interfaces[iface]) {
+				if(e.family == 'IPv4' && !(e.internal)) return e.address;
+			}
 		}
-	}
-	return null;
-}
+		return null;
+	})();
 
 function wsApiGw(httpServer, wsApi) {
 	const apiGw = new (require('./ApiGw'))(wsApi.routes),
-		mappingKey = wsApi.mappingKey || 'action',
-		SourceIp = findIP(); //require('os').networkInterfaces().en0.find(e=>e.family == 'IPv4').address;
-
+		mappingKey = wsApi.mappingKey || 'action';
 
 	// Create web socket server on top of a regular http server
 	const wsServer = require('ws').Server;
-	const wss = new wsServer({
-		server: httpServer,
-		verifyClient (info, fn) {
-			wss.emit('verifyClient', info, fn);
-		}
-	});
-
+	const wss = new wsServer({ server: httpServer });
 	const clients = {};
 
-	// Local equivalent functions for AWS.ApiGatewayManagementApi.
-	// Add deleteConnection if required.
+	// Local equivalent of AWS.ApiGatewayManagementApi functions. Add deleteConnection if required.
 	const clientContext = {
 		postToConnection ({Data, ConnectionId}) {
 			return new Promise((resolve, reject) => {
@@ -56,10 +45,7 @@ function wsApiGw(httpServer, wsApi) {
 				if(clients[ConnectionId]) {
 					resolve({
 						"ConnectedAt": new Date,
-						"Identity": {
-							SourceIp,
-							"UserAgent": null
-						},
+						"Identity": { SourceIp, "UserAgent": null },
 						"LastActiveAt": new Date()
 					});
 				} else {
@@ -69,30 +55,17 @@ function wsApiGw(httpServer, wsApi) {
 		}
 	};
 
-	wss.removeAllListeners('verifyClient');
-	wss.on('verifyClient', async (info, fn) => {
-		//const qString = url.parse(info.req.url,true).query;
-		const result = await apiGw.invoke(
-			'$connect',
-			'WEBSOCKET',
+	wss.on('connection', async(ws, req) => {
+		const connectionId = req.headers['sec-websocket-key'];
+		await apiGw.invoke(
+			'$connect', 'WEBSOCKET',
 			{ //event
-				requestContext: {
-					routeKey: '$connect',
-					connectionId: info.req.headers['sec-websocket-key']
-				},
-				headers: {
-					...info.req.headers,
-					queryStringParameters: url.parse(info.req.url,true).query
-				},
-				body: info.req.body
+				requestContext: { routeKey: '$connect', connectionId: req.headers['sec-websocket-key'] },
+				headers: { ...req.headers, queryStringParameters: url.parse(req.url,true).query },
+				body: req.body
 			},
 			{ clientContext } //context
 		);
-		fn(result.statusCode === 200, result.statusCode, result.body);
-	});
-
-	wss.on('connection', (ws, req) => {
-		const connectionId = req.headers['sec-websocket-key'];
 		clients[connectionId] = ws;
 
 		ws.on('ping', d => {console.log(`ping ${d}`);});
@@ -101,13 +74,9 @@ function wsApiGw(httpServer, wsApi) {
 			try {
 				delete clients[connectionId];
 				await apiGw.invoke(
-					'$disconnect',
-					'WEBSOCKET',
+					'$disconnect', 'WEBSOCKET',
 					{ //event
-						requestContext: {
-							routeKey: '$disconnect',
-							connectionId: req.headers['sec-websocket-key']
-						},
+						requestContext: { routeKey: '$disconnect', connectionId: req.headers['sec-websocket-key'] },
 						headers: req.headers,
 						body: req.body
 					}
@@ -125,7 +94,10 @@ function wsApiGw(httpServer, wsApi) {
 				d = JSON.parse(message);
 			} catch(e) {
 				console.error('ws.on messgage error:', e.code, e.message);
-				await clientContext.postToConnection({ error: 'Invalid JSON:' + message });
+				await clientContext.postToConnection({
+					Data: JSON.stringify({ error: 'Invalid JSON:' + message }),
+					ConnectionId: connectionId
+				});
 				return;
 			}
 
