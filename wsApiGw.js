@@ -20,8 +20,38 @@ function wsApiGw(httpServer, wsApi) {
 
 	// Create web socket server on top of a regular http server
 	const wsServer = require('ws').Server;
-	const wss = new wsServer({ server: httpServer });
+	const wss = new wsServer({ noServer: true });
+	//const {Server} = require('ws');
+	//const wss = new (require('ws').Server)({ noServer: true, clientTracking: true });
 	const clients = {};
+
+	function onSocketError(err) {
+		console.error(`onSocketError ${err}`);
+	}
+
+	httpServer.on('upgrade', async function upgrade(req, socket, head) {
+		socket.on('error', onSocketError);
+	
+		const result = await apiGw.invoke(
+			'$connect', 'WEBSOCKET',
+			{ //event
+				requestContext: { routeKey: '$connect', connectionId: req.headers['sec-websocket-key'] },
+				headers: { ...req.headers, queryStringParameters: url.parse(req.url,true).query },
+				body: req.body
+			},
+			{ clientContext } //context
+		);
+
+		if (result.statusCode < 200 || result.statusCode > 299) {
+			socket.write(`HTTP/1.1 ${result.statusCode}\r\n\r\n`);
+			return;
+		}
+		socket.removeListener('error', onSocketError);
+
+		wss.handleUpgrade(req, socket, head, function done(ws) {
+			wss.emit('connection', ws, req, 'client');
+		});
+	});
 
 	// Local equivalent of AWS.ApiGatewayManagementApi functions. Add deleteConnection if required.
 	const clientContext = {
@@ -52,12 +82,24 @@ function wsApiGw(httpServer, wsApi) {
 					reject({code: 'GoneException', message: 410});
 				}
 			});
+		},
+
+		deleteConnection({ConnectionId}) {
+			return new Promise((resolve, reject) => {
+				if(clients[ConnectionId]) {
+					clients[ConnectionId].close(1008);
+					delete clients[ConnectionId];
+					resolve();
+				} else {
+					reject({code: 'GoneException', message: 410});
+				}
+			});
 		}
 	};
 
-	wss.on('connection', async(ws, req) => {
+	wss.on('connection', (ws, req) => {
 		const connectionId = req.headers['sec-websocket-key'];
-		await apiGw.invoke(
+		/*const result = await apiGw.invoke(
 			'$connect', 'WEBSOCKET',
 			{ //event
 				requestContext: { routeKey: '$connect', connectionId: req.headers['sec-websocket-key'] },
@@ -66,6 +108,7 @@ function wsApiGw(httpServer, wsApi) {
 			},
 			{ clientContext } //context
 		);
+		//ws_socket.write(`HTTP/1.1 ${result.statusCode} ${result.body}\r\n\r\n`);*/
 		clients[connectionId] = ws;
 
 		ws.on('ping', d => {console.log(`ping ${d}`);});
