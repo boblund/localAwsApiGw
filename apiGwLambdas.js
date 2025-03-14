@@ -112,9 +112,9 @@ async function apiGwLambdas( { filesPath, templateName } ) {
 		//const environment = Environment?.Variables ? Environment.Variables : {};
 		const environment = { ...template?.Globals?.Function?.Environment?.Variables, ...Environment?.Variables };
 		for( let envVar in environment ) {
-			environment[envVar] = environment[envVar].Ref
-				? template.Parameters[environment[envVar].Ref].Default
-				: environment[envVar]['Fn::Sub']
+			environment[envVar] = environment[envVar]?.Ref
+				? template.Parameters[environment[envVar]?.Ref]?.Default
+				: environment[envVar]?.['Fn::Sub']
 					? environment[envVar]['Fn::Sub']
 					: environment[envVar];
 		}
