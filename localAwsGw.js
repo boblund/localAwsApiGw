@@ -41,9 +41,8 @@ function listen( server ) {
 	} );
 }
 
-let app = null;
-
 ( async () => {
+	let app = null, restApi, wsApi, nodeModuleLayertContentUri, nodeModuleLayertPath;
 	for( let server in servers ) {
 		switch( server ) {
 			case 'web':
@@ -58,8 +57,8 @@ let app = null;
 
 			case 'rest':
 				app = app ? app : express(); //app if necessary
-				const { restApi, nodeModuleLayertContentUri } = await apiGwLambdas( servers.rest );
-				const nodeModuleLayertPath = nodeModuleLayertContentUri
+				( { restApi, nodeModuleLayertContentUri } = await apiGwLambdas( servers.rest ) );
+				nodeModuleLayertPath = nodeModuleLayertContentUri
 					? `${ servers.rest.filesPath }/${ nodeModuleLayertContentUri }nodejs/node_modules`
 					: undefined;
 				if( restApi && Object.keys( restApi ).length > 0 ) {
@@ -72,9 +71,12 @@ let app = null;
 
 			case 'ws':
 				if( !servers?.ws ) break;
-				const { wsApi } = await apiGwLambdas( servers.ws );
+				( { wsApi, nodeModuleLayertContentUri } = await apiGwLambdas( servers.ws ) );
+				nodeModuleLayertPath = nodeModuleLayertContentUri
+					? `${ servers.ws.filesPath }/${ nodeModuleLayertContentUri }nodejs/node_modules`
+					: undefined;
 				if( wsApi && Object.keys( wsApi.routes ).length > 0 ) {
-					wsApiGw( httpServer, wsApi );
+					wsApiGw( httpServer, wsApi, nodeModuleLayertPath );
 				} else {
 					console.error( `${ process.argv[1].split( '/' ).pop() }: no wsApi` );
 					process.exit( 1 );
