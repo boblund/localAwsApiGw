@@ -7,26 +7,25 @@
 // Integrated local AWS s3 static web and rest/ws api server.
 // Based on https://stackoverflow.com/a/34838031/6996491.
 
-const express = require( 'express' );
-const fs = require( 'fs' );
-const os = require( 'os' );
-const restApiGw = require( './restApiGw.js' );
-const wsApiGw = require( './wsApiGw.js' );
-const apiGwLambdas = require( './apiGwLambdas.js' );
-const { existsSync } = require( 'fs' );
-const hostName = os.hostname(); //'bobsm1.local';
+import express from 'express';
+import fs from 'fs';
+import os from 'os';
+import { restApiGw } from './restApiGw.mjs';
+import { wsApiGw } from './wsApiGw.mjs';
+import { apiGwLambdas } from './apiGwLambdas.mjs';
+const hostName = os.hostname();
 
-const servers = require( './cmdLineParse.js' ); //process command line
+import { servers }  from './cmdLineParse.mjs';
 if( Object.keys( servers ).length == 0 ) {
 	process.exit( 1 );
 }
 
 const httpServer = process.env.HTTPS
-	? require( 'https' ).createServer( {
+	? await( 'https' ).createServer( {
 		key: fs.readFileSync( `${ hostName }.key` ),
 		cert: fs.readFileSync( `${ hostName }.cert` )
 	} )
-	: require( 'http' ).createServer();
+	: ( await import( 'http' ) ).createServer();
 
 const portRange = [ 10000, 60000 ];
 function generatePort() { return ( Math.floor( Math.random() * ( portRange[1] - portRange[0] + 1 ) ) + portRange[0] ); }
@@ -46,7 +45,7 @@ function listen( server ) {
 	for( let server in servers ) {
 		switch( server ) {
 			case 'web':
-				if( existsSync( servers.web.filesPath ) ) {
+				if( fs.existsSync( servers.web.filesPath ) ) {
 					app = app ? app : express(); //app if necessary
 					app.use( express.static( servers.web.filesPath ) );
 				} else {
@@ -62,7 +61,7 @@ function listen( server ) {
 					? `${ servers.rest.filesPath }/${ nodeModuleLayertContentUri }nodejs/node_modules`
 					: undefined;
 				if( restApi && Object.keys( restApi ).length > 0 ) {
-					restApiGw( app, restApi, nodeModuleLayertPath );
+					await restApiGw( app, restApi, nodeModuleLayertPath, servers.rest.filesPath );
 				} else {
 					console.error( `${ process.argv[1].split( '/' ).pop() }: no restApi` );
 					process.exit( 1 );
@@ -76,7 +75,7 @@ function listen( server ) {
 					? `${ servers.ws.filesPath }/${ nodeModuleLayertContentUri }nodejs/node_modules`
 					: undefined;
 				if( wsApi && Object.keys( wsApi.routes ).length > 0 ) {
-					wsApiGw( httpServer, wsApi, nodeModuleLayertPath );
+					await wsApiGw( httpServer, wsApi, nodeModuleLayertPath, servers.rest.filesPath );
 				} else {
 					console.error( `${ process.argv[1].split( '/' ).pop() }: no wsApi` );
 					process.exit( 1 );

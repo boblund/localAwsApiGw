@@ -1,12 +1,13 @@
 // License: Creative Commons Attribution-NonCommercial 4.0 International
 
-"use strict";
+export { apiGwLambdas };
 
-const jsYaml = require( 'js-yaml' );
-const { schema } = require( 'yaml-cfn' );
-const { readFileSync } = require( 'fs' );
-const { join } = require( 'path' );
-//const ssm = new (require('aws-sdk')).SSM({region: 'us-east-1'});
+import jsYaml from 'js-yaml';
+import { schema } from 'yaml-cfn';
+import { readFileSync } from 'fs';
+import { join } from 'path';
+import { SSMClient, GetParameterCommand } from '@aws-sdk/client-ssm';
+const ssm = new SSMClient( { region: process.env.REGION } );
 
 async function apiGwLambdas( { filesPath, templateName } ) {
 	let apis = { restApi: {} };
@@ -47,10 +48,10 @@ async function apiGwLambdas( { filesPath, templateName } ) {
 			// Parameter is aws:ssm. Retrive actual value
 			let value = null;
 			try {
-				value = ( await ssm.getParameter( {
+				value = await ssm.send( new GetParameterCommand( {
 					Name: template.Parameters[param].Default,
 					WithDecryption: true
-				} ).promise() ).Parameter.Value;
+				} ) );
 			} catch( e ){}
 			template.Parameters[param].Default = value;
 		}
@@ -134,5 +135,3 @@ async function apiGwLambdas( { filesPath, templateName } ) {
 	apis.nodeModuleLayertContentUri = template.Resources?.NodeModuleLayer?.Properties?.ContentUri;
 	return apis;
 }
-
-module.exports = apiGwLambdas;

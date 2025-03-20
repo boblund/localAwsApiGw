@@ -1,28 +1,30 @@
 // License: Creative Commons Attribution-NonCommercial 4.0 International
 // Based on https://github.com/JamesKyburz/aws-lambda-ws-server
 
-'use strict';
 
-const url = require( 'url' ),
-	SourceIp = ( () => {
-		const interfaces = require( 'os' ).networkInterfaces();
-		for( const iface of Object.keys( interfaces ) ){
-			for( const e of interfaces[iface] ) {
-				if( e.family == 'IPv4' && !( e.internal ) ) return e.address;
-			}
+export { wsApiGw };
+
+import os from 'os';
+import url from 'url';
+import ws from 'ws';
+
+const SourceIp = ( () => {
+	const interfaces = os.networkInterfaces();
+	for( const iface of Object.keys( interfaces ) ){
+		for( const e of interfaces[iface] ) {
+			if( e.family == 'IPv4' && !( e.internal ) ) return e.address;
 		}
-		return null;
-	} )();
+	}
+	return null;
+} )();
 
-function wsApiGw( httpServer, wsApi, nodeModuleLayertPath ) {
-	const apiGw = new ( require( './ApiGw' ) )( wsApi.routes, nodeModuleLayertPath );
+async function wsApiGw( httpServer, wsApi, nodeModuleLayertPath, apiDir  ) {
+	const apiGw = new ( await import( './ApiGw.mjs' ) )( wsApi.routes, nodeModuleLayertPath, apiDir  );
 	const mappingKey = wsApi.mappingKey || 'action';
 
 	// Create web socket server on top of a regular http server
-	const wsServer = require( 'ws' ).Server;
+	const wsServer = ws.Server;
 	const wss = new wsServer( { noServer: true } );
-	//const {Server} = require('ws');
-	//const wss = new (require('ws').Server)({ noServer: true, clientTracking: true });
 	const clients = {};
 
 	function onSocketError( err ) {
@@ -53,7 +55,7 @@ function wsApiGw( httpServer, wsApi, nodeModuleLayertPath ) {
 		} );
 	} );
 
-	// Local equivalent of AWS.ApiGatewayManagementApi functions. Add deleteConnection if required.
+	// Local equivalent of AWS.ApiGatewayManagementApi functions. Add deleteConnection.
 	const clientContext = {
 		postToConnection ( { Data, ConnectionId } ) {
 			return new Promise( ( resolve, reject ) => {
@@ -164,5 +166,3 @@ function wsApiGw( httpServer, wsApi, nodeModuleLayertPath ) {
 		} );
 	} );
 }
-
-module.exports = wsApiGw;

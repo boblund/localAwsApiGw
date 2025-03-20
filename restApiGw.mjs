@@ -1,18 +1,19 @@
 // License: Creative Commons Attribution-NonCommercial 4.0 International
-
-'use strict';
-
 // Based on https://steveholgado.com/aws-lambda-local-development/#creating-our-lambda-function
 
-const express = require( 'express' );
-const bodyParser = require( 'body-parser' );
 
-function restApiGw( app, restApi, nodeModuleLayertPath ) {
+export { restApiGw };
+import express from 'express';
+import bodyParser from 'body-parser';
+import cors from 'cors';
+import { ApiGw } from './ApiGw.mjs';
+
+async function restApiGw( app, restApi, nodeModuleLayertPath, apiDir ) {
 	app.use( bodyParser.urlencoded( { extended: true } ) );
 	app.use( express.text() );
-	app.use( require( 'cors' )() );
+	app.use( cors() );
 
-	const apiGw = new ( require( './ApiGw' ) )( restApi, nodeModuleLayertPath );
+	const apiGw = await new ApiGw( restApi, nodeModuleLayertPath, apiDir )();
 
 	app.post( '/api/webhook', express.raw( { type: 'application/json' } ), async ( req, res ) => {
 		const result = await apiGw.invoke(
@@ -44,5 +45,3 @@ function restApiGw( app, restApi, nodeModuleLayertPath ) {
 			.end( result.body ? result.body  : result.message );
 	} );
 }
-
-module.exports = restApiGw;
