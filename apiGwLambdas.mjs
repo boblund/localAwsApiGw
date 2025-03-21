@@ -2,7 +2,7 @@
 
 export { apiGwLambdas };
 
-import jsYaml from 'js-yaml';
+import { load } from 'js-yaml';
 import { schema } from 'yaml-cfn';
 import { readFileSync } from 'fs';
 import { join } from 'path';
@@ -27,7 +27,7 @@ async function apiGwLambdas( { filesPath, templateName } ) {
 		case 'yaml':
 		case 'yml':
 			try {
-				template = jsYaml.load(
+				template = load(
 					readFileSync( templatePath, 'utf8' ),
 					{ schema: schema }
 				);

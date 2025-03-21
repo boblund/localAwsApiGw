@@ -1,10 +1,10 @@
 export { ApiGw };
 
 //import appModulePath from 'app-module-path';
-import fs from 'fs';
+import { existsSync, symlinkSync, rmSync } from 'fs';
 
 function getHandler( name ){
-	return fs.existsSync( `./${ name }.mjs` ) ? `./${ name }.mjs` : `./${ name }.js`;
+	return existsSync( `./${ name }.mjs` ) ? `./${ name }.mjs` : `./${ name }.js`;
 }
 
 const localEnv = await ( async () => {
@@ -16,7 +16,7 @@ const localEnv = await ( async () => {
 
 function ApiGw( apis, layersModulePath, apiDir ) {
 	return async () => {
-		if( layersModulePath ) fs.symlinkSync( layersModulePath, `${ apiDir }/node_modules` ); //appModulePath.addPath( layersModulePath );
+		if( layersModulePath ) symlinkSync( layersModulePath, `${ apiDir }/node_modules` ); //appModulePath.addPath( layersModulePath );
 		const lambdas = {};
 		const savedProcessEnv = process.env; // Save callers environment
 		for( const api in apis ) {
@@ -36,7 +36,7 @@ function ApiGw( apis, layersModulePath, apiDir ) {
 				} );
 			};
 		};
-		if( layersModulePath ) fs.rmSync( `${ apiDir }/node_modules` );//appModulePath.removePath( layersModulePath );
+		if( layersModulePath ) rmSync( `${ apiDir }/node_modules` );//appModulePath.removePath( layersModulePath );
 		process.env = savedProcessEnv; // Restore callers environment
 
 		this.invoke = async function( route, method, event, context ){

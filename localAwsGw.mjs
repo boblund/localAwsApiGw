@@ -8,12 +8,12 @@
 // Based on https://stackoverflow.com/a/34838031/6996491.
 
 import express from 'express';
-import fs from 'fs';
-import os from 'os';
+import { readFileSync, existsSync } from 'fs';
+import { hostname } from 'os';
 import { restApiGw } from './restApiGw.mjs';
 import { wsApiGw } from './wsApiGw.mjs';
 import { apiGwLambdas } from './apiGwLambdas.mjs';
-const hostName = os.hostname();
+const hostName = hostname();
 
 import { servers }  from './cmdLineParse.mjs';
 if( Object.keys( servers ).length == 0 ) {
@@ -22,8 +22,8 @@ if( Object.keys( servers ).length == 0 ) {
 
 const httpServer = process.env.HTTPS
 	? await( 'https' ).createServer( {
-		key: fs.readFileSync( `${ hostName }.key` ),
-		cert: fs.readFileSync( `${ hostName }.cert` )
+		key: readFileSync( `${ hostName }.key` ),
+		cert: readFileSync( `${ hostName }.cert` )
 	} )
 	: ( await import( 'http' ) ).createServer();
 
@@ -45,7 +45,7 @@ function listen( server ) {
 	for( let server in servers ) {
 		switch( server ) {
 			case 'web':
-				if( fs.existsSync( servers.web.filesPath ) ) {
+				if( existsSync( servers.web.filesPath ) ) {
 					app = app ? app : express(); //app if necessary
 					app.use( express.static( servers.web.filesPath ) );
 				} else {

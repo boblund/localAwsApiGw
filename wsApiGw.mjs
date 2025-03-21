@@ -4,12 +4,12 @@
 
 export { wsApiGw };
 
-import os from 'os';
-import url from 'url';
+import { networkInterfaces } from 'os';
+import { parse } from 'url';
 import ws from 'ws';
 
 const SourceIp = ( () => {
-	const interfaces = os.networkInterfaces();
+	const interfaces = networkInterfaces();
 	for( const iface of Object.keys( interfaces ) ){
 		for( const e of interfaces[iface] ) {
 			if( e.family == 'IPv4' && !( e.internal ) ) return e.address;
@@ -38,7 +38,7 @@ async function wsApiGw( httpServer, wsApi, nodeModuleLayertPath, apiDir  ) {
 			'$connect', 'WEBSOCKET',
 			{ //event
 				requestContext: { routeKey: '$connect', connectionId: req.headers['sec-websocket-key'] },
-				headers: { ...req.headers, queryStringParameters: url.parse( req.url, true ).query },
+				headers: { ...req.headers, queryStringParameters: parse( req.url, true ).query },
 				body: req.body
 			},
 			{ clientContext } //context
@@ -105,7 +105,7 @@ async function wsApiGw( httpServer, wsApi, nodeModuleLayertPath, apiDir  ) {
 			'$connect', 'WEBSOCKET',
 			{ //event
 				requestContext: { routeKey: '$connect', connectionId: req.headers['sec-websocket-key'] },
-				headers: { ...req.headers, queryStringParameters: url.parse(req.url,true).query },
+				headers: { ...req.headers, queryStringParameters: parse(req.url,true).query },
 				body: req.body
 			},
 			{ clientContext } //context
