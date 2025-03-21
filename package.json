@@ -1,6 +1,6 @@
 {
   "name": "local-lambda",
-	"type": "module",
+  "type": "module",
   "version": "1.0.0",
   "description": "",
   "main": "index.js",
@@ -14,7 +14,6 @@
   },
   "dependencies": {
     "@aws-sdk/client-ssm": "^3.759.0",
-    "app-module-path": "^2.2.0",
     "cors": "^2.8.5",
     "js-yaml": "^4.1.0",
     "minimist": "^1.2.6",
