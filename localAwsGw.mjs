@@ -86,14 +86,14 @@ function listen( server ) {
 
 	if( app ) httpServer.on( 'request', app ); // Mount the app if it exists
 
-	let port = null;
+	let port = process.env?.PORT ? process.env.PORT : null;
 	while( true ) {
 		try {
 			if( port = await listen( httpServer ) )
 				break;
 		} catch( e ){
-			if( e.code == 'EADDRINUSE' ) continue;
-			console.error( `server error: ${ e.code }` );
+			if( !process.env?.PORT && e.code == 'EADDRINUSE' ) continue;
+			console.error( `Error: port ${ port } ${ e.code }` );
 			process.exit( 1 );
 		}
 	}
