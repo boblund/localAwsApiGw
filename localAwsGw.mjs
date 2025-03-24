@@ -75,7 +75,7 @@ function listen( server ) {
 					? `${ servers.ws.filesPath }/${ nodeModuleLayertContentUri }nodejs/node_modules`
 					: undefined;
 				if( wsApi && Object.keys( wsApi.routes ).length > 0 ) {
-					await wsApiGw( httpServer, wsApi, nodeModuleLayertPath, servers.rest.filesPath );
+					await wsApiGw( httpServer, wsApi, nodeModuleLayertPath, servers.ws.filesPath );
 				} else {
 					console.error( `${ process.argv[1].split( '/' ).pop() }: no wsApi` );
 					process.exit( 1 );

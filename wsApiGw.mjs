@@ -6,7 +6,9 @@ export { wsApiGw };
 
 import { networkInterfaces } from 'os';
 import { parse } from 'url';
-import ws from 'ws';
+//import ws from 'ws';
+import { WebSocketServer } from 'ws';
+import { ApiGw } from './ApiGw.mjs';
 
 const SourceIp = ( () => {
 	const interfaces = networkInterfaces();
@@ -19,12 +21,13 @@ const SourceIp = ( () => {
 } )();
 
 async function wsApiGw( httpServer, wsApi, nodeModuleLayertPath, apiDir  ) {
-	const apiGw = new ( await import( './ApiGw.mjs' ) )( wsApi.routes, nodeModuleLayertPath, apiDir  );
+	const apiGw = await new ApiGw( wsApi.routes, nodeModuleLayertPath, apiDir  )();
 	const mappingKey = wsApi.mappingKey || 'action';
 
 	// Create web socket server on top of a regular http server
-	const wsServer = ws.Server;
-	const wss = new wsServer( { noServer: true } );
+	//const wsServer = ws.Server;
+	//const wss = new wsServer( { noServer: true } );
+	const wss = new WebSocketServer( { noServer: true } );
 	const clients = {};
 
 	function onSocketError( err ) {

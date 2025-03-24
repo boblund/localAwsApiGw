@@ -4,7 +4,7 @@ export { ApiGw };
 import { existsSync, symlinkSync, rmSync } from 'fs';
 
 function getHandler( name ){
-	return existsSync( `./${ name }.mjs` ) ? `./${ name }.mjs` : `./${ name }.js`;
+	return existsSync( `${ name }.mjs` ) ? `${ name }.mjs` : `${ name }.js`;
 }
 
 const localEnv = await ( async () => {
